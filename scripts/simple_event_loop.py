@@ -4,7 +4,7 @@ import RPi.GPIO as GPIO
 
 import asyncio
 import os
-from touch_play import TouchPlay
+from treechipi.touch_play import TouchPlay
 
 import pydub
 
@@ -13,6 +13,8 @@ GPIO.setmode(GPIO.BCM)
 # Set up GPIO pins
 # 4 inputs
 #pins = [5, 6, 13, 19, 26, 2, 3, 4, 17]
+
+#relay_trigger_pins
 
 pins = [5, 6, 2, 3]
 
@@ -30,15 +32,13 @@ def filesFromDir(d, wd=None):
 
 
 touchSensors = []
-
-
 p1 = TouchPlay(5, filesFromDir('p1'), timeout=9, sustain=True)
 #p2 = TouchPlay(16, filesFromDir('p2'), timeout=20, sustain=True)
 t2 = TouchPlay(17, filesFromDir('t2'), timeout=5, sustain=False)
+t2.minimum_interval = 11
 
 touchSensors.append(p1)
 touchSensors.append(t2)
-
 
 
 async def seconds():
@@ -56,11 +56,14 @@ async def slower():
 
 
 async def touch_check():
-    for s in touchSensors:
-        s.check()
+    while True:
+        await asyncio.sleep(0.6)
+        print("Checking touch pins")
+        for s in touchSensors:
+            s.check_new()
 
 
-async def play():
+async def play2():
     print('Subprocess playing')
     proc = await asyncio.create_subprocess_exec('sleep', '5')
     returncode = await proc.wait()
@@ -80,8 +83,6 @@ async def play(sound_file):
         print(f'[stdout]\n{stdout.decode()}')
     if stderr:
         print(f'[stderr]\n{stderr.decode()}')
-
-#asyncio.run(run('ls /zzz'))
 
 
 async def run(cmd):
@@ -106,8 +107,6 @@ async def do_subprocess():
     print('Subprocess done sleeping.  Return code = %d' % returncode)
 
 
-
-
 async def sleep_report(number):
     for i in range(number + 1):
         print('Slept for %d seconds' % i)
@@ -119,29 +118,18 @@ if __name__ == '__main__':
 
     #asyncio.run(run('ls /zzz'))
 
-    sound_file = touchSensors[0].fileList[0]
+    #sound_file = touchSensors[0].fileList[0]
 
     #asyncio.run(play(sound_file))
-
-    while True:
-
-        for s in touchSensors:
-            s.check_new()
 
     # subprocess.Popen('omxplayer /home/pi/media/p1/23Secs_RainScapeWInsects.aif',
     #                   stderr=subprocess.STDOUT, shell=True)
 
-    #loop = asyncio.get_event_loop()
+    loop = asyncio.get_event_loop()
 
-
-
-    # try:
-    #     print('task creation started')
-    #     loop.create_task(seconds())
-    #     loop.create_task(slower())
-    #     loop.create_task(do_subprocess())
-    #     loop.create_task(sleep_report(5))
-    #     #loop.create_task(touch_check)
-    #     loop.run_forever()
-    # finally:
-    #     loop.close()
+    try:
+         print('task creation started...')
+         loop.create_task(touch_check())
+         loop.run_forever()
+    finally:
+         loop.close()

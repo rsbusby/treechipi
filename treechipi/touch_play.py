@@ -6,6 +6,7 @@ import asyncio
 
 from time import sleep 
 import os
+from random import randint
 
 #import commands
 import subprocess
@@ -24,6 +25,7 @@ class TouchPlay(object):
         self.pin = pin
         self.timeout = timeout
         self.sustain = sustain
+        self.minimum_interval = None
         self.vol = vol
         if self.vol:
             self.volOpt = " --vol " + str(vol)
@@ -42,6 +44,13 @@ class TouchPlay(object):
         self.lastTime = datetime.now()
         self.length = None
 
+        # relay output
+        self.relay_output_pin = None
+
+
+        # testing
+        self.mock = True
+        self.mock_period = 20
 
     def get_length(self, soundFile):
         sound1 = AudioSegment.from_file(soundFile, format="aiff")
@@ -108,15 +117,35 @@ class TouchPlay(object):
             print(f'[stderr]\n{stderr.decode()}')
 
     def check_new(self):
+        """ signal of zero is active """
+
+        if self.minimum_interval:
+            now = datetime.now()
+            interval = now - self.lastTime
+            interval_seconds = interval.seconds
+
+
+            #print(f"{interval_seconds > self.minimum_interval} {self.minimum_interval} interval?")
+            if not (interval_seconds > self.minimum_interval):
+                print(f"{self.pin} pin waiting {self.minimum_interval - interval_seconds}")
+                return
+            else:
+                print(f"{self.pin} processing, {interval_seconds} {self.minimum_interval}")
+
+
+        print(f"checking {self.pin}")
+        if self.mock:
+            sense_val = randint(0, self.mock_period)
+        else:
+            sense_val = GPIO.input(self.pin)
+        self.process_audio_signal(sense_val)
+
+    def process_audio_signal(self, sense_val):
         """
-        :return: Check GPIO and play sounds
+        :return: Check GPIO and play sounds, signal of 0 is active
         """
         #print(str(self.pin) + " " + str(GPIO.input(self.pin))   + "  pos: " + str(self.pos)  + " " + str(self.iter))
         #self.iter += 1
-        sleep(0.4)
-        from random import randint
-
-        sense_val = randint(0, 20) #GPIO.input(self.pin)
 
         # get time
         now = datetime.now()
@@ -138,14 +167,14 @@ class TouchPlay(object):
                 if self.wavFile:
                     if self.pos <= 0 and not self.sustain:
                         os.system("omxplayer " + self.wavFile + " &")
-                        print("starting " + self.wavFile + " ")  # + str(self.iter))
+                        print(f"{self.pin} starting aplay {self.wavFile}")  # + str(self.iter))
                     else:
                         posOpt = ''
                         if self.pos:
-                            posOpt = " --pos " + str(self.pos)
+                            posOpt = f" --pos {self.pos}"
                         outStr = " > /dev/null 2>&1 "
                         os.system("omxplayer --no-osd " + self.wavFile + " " + posOpt + self.volOpt + outStr + " &")
-                        print(f"starting {self.wavFile} with omx, for {self.length} seconds")  # + str(self.iter)
+                        print(f"{self.pin} starting {self.wavFile} with omx, for {self.length} seconds")  # + str(self.iter)
                         # adjust pos because omxplayer takes a while to start
                         self.pos = self.pos - 1.5
                     # now = datetime.now()
@@ -154,7 +183,7 @@ class TouchPlay(object):
                     self.startTime = now
 
             else:
-                print(f"{self.wavFile} still playing")
+                print(f"{self.pin} {self.wavFile} still playing")
 
             if self.playing and self.sustain:
                 self.lastTime = now
@@ -168,7 +197,7 @@ class TouchPlay(object):
                 if delta.total_seconds() > self.timeout:
                     self.append_pos(delta)
                     self.kill_sound()
-                    print(str(self.pin) + " killed at " + str(self.pos))
+                    print(f"{self.pin} killed at {self.pos}")
                     self.lastTime = now
 
 
