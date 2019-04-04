@@ -46,11 +46,13 @@ class TouchPlay(object):
 
         # relay output
         self.relay_output_pin = None
-
+        self.relay_output_duration = 2
 
         # testing
         self.mock = True
         self.mock_period = 20
+
+        self.event_loop = None
 
     def get_length(self, soundFile):
         sound1 = AudioSegment.from_file(soundFile, format="aiff")
@@ -116,7 +118,21 @@ class TouchPlay(object):
         if stderr:
             print(f'[stderr]\n{stderr.decode()}')
 
-    def check_new(self):
+    async def trigger_relay(self):
+        """
+        Trigger relay for a bit
+        """
+        print(f'{self.pin} starting relay on output pin {self.relay_output_pin}')
+        #GPIO.output(self.relay_output_pin, True)
+        await asyncio.sleep(self.relay_output_duration)
+        #GPIO.output(self.relay_output_pin, False)
+        print(f'{self.pin} stopping relay on output pin {self.relay_output_pin}')
+
+    def trigger_relay_old(self):
+        print(f'{self.pin} triggering relay on output {self.relay_output_pin}')
+        #GPIO.output(self.relay_output_pin, True)
+
+    def check_new(self, event_loop):
         """ signal of zero is active """
 
         if self.minimum_interval:
@@ -124,20 +140,21 @@ class TouchPlay(object):
             interval = now - self.lastTime
             interval_seconds = interval.seconds
 
-
-            #print(f"{interval_seconds > self.minimum_interval} {self.minimum_interval} interval?")
             if not (interval_seconds > self.minimum_interval):
                 print(f"{self.pin} pin waiting {self.minimum_interval - interval_seconds}")
                 return
             else:
                 print(f"{self.pin} processing, {interval_seconds} {self.minimum_interval}")
 
-
         print(f"checking {self.pin}")
         if self.mock:
             sense_val = randint(0, self.mock_period)
         else:
             sense_val = GPIO.input(self.pin)
+
+        if not sense_val and self.relay_output_pin:
+            event_loop.create_task(self.trigger_relay())
+
         self.process_audio_signal(sense_val)
 
     def process_audio_signal(self, sense_val):

@@ -9,6 +9,15 @@ from treechipi.touch_play import TouchPlay
 import pydub
 
 GPIO.setmode(GPIO.BCM)
+GPIO.setwarnings(False)  # Disable Warnings
+
+relay_output_pins = [22, 23]  # Set the relay GPIO pins that are required  24,25
+
+#Set our GPIO pins to outputs and set them to off
+
+for i in relay_output_pins:
+    GPIO.setup(i, GPIO.OUT)
+    GPIO.output(i, False)
 
 # Set up GPIO pins
 # 4 inputs
@@ -36,6 +45,7 @@ p1 = TouchPlay(5, filesFromDir('p1'), timeout=9, sustain=True)
 #p2 = TouchPlay(16, filesFromDir('p2'), timeout=20, sustain=True)
 t2 = TouchPlay(17, filesFromDir('t2'), timeout=5, sustain=False)
 t2.minimum_interval = 11
+t2.relay_output_pin = relay_output_pins[0]
 
 touchSensors.append(p1)
 touchSensors.append(t2)
@@ -55,12 +65,12 @@ async def slower():
             print("slow")
 
 
-async def touch_check():
+async def touch_check(event_loop):
     while True:
         await asyncio.sleep(0.6)
         print("Checking touch pins")
         for s in touchSensors:
-            s.check_new()
+            s.check_new(event_loop)
 
 
 async def play2():
@@ -129,7 +139,7 @@ if __name__ == '__main__':
 
     try:
          print('task creation started...')
-         loop.create_task(touch_check())
+         loop.create_task(touch_check(loop))
          loop.run_forever()
     finally:
          loop.close()
