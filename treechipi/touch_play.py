@@ -1,21 +1,19 @@
 
-
 import RPi.GPIO as GPIO
-
 import asyncio
 
 from time import sleep 
 import os
 from random import randint
 
-#import commands
 import subprocess
 import pydub
 from pydub import AudioSegment
 from pydub.playback import play
 from datetime import datetime
 import random
-from math import floor
+
+from treechipi.tree_colors import *
 
 
 class TouchPlay(object):
@@ -47,6 +45,12 @@ class TouchPlay(object):
         # relay output
         self.relay_output_pin = None
         self.relay_output_duration = 2
+
+        # LED output
+        self.led_enabled = False
+        self.led_strip = None
+        self.base_color = red
+        self.active_color = purple
 
         # testing
         self.mock = True
@@ -83,7 +87,7 @@ class TouchPlay(object):
             self.pos = 0
             
     def kill_sound(self):
-        ''' stop playing '''
+        """ stop playing """
         print(f"Killing {self.wavFile}")
         #psOut = subprocess.check_output('ps -ax | grep ' + self.wavFile, stderr=subprocess.STDOUT, shell=True)
         p = subprocess.Popen(f'ps -ax | grep {self.wavFile}', shell=True, stdout=subprocess.PIPE)
@@ -104,19 +108,35 @@ class TouchPlay(object):
         if self.length - self.pos < float(self.length) / 4.0:
             self.pos = 0
 
-    async def play(sound_file):
-        proc = await asyncio.create_subprocess_shell(
-            "omxplayer {}".format(sound_file),
-            stdout=asyncio.subprocess.PIPE,
-            stderr=asyncio.subprocess.PIPE)
+    # async def play(sound_file):
+    #     proc = await asyncio.create_subprocess_shell(
+    #         "omxplayer {}".format(sound_file),
+    #         stdout=asyncio.subprocess.PIPE,
+    #         stderr=asyncio.subprocess.PIPE)
+    #
+    #     stdout, stderr = await proc.communicate()
+    #
+    #     print(f'[{sound_file!r} exited with {proc.returncode}]')
+    #     if stdout:
+    #         print(f'[stdout]\n{stdout.decode()}')
+    #     if stderr:
+    #         print(f'[stderr]\n{stderr.decode()}')
 
-        stdout, stderr = await proc.communicate()
+    async def trigger_led(self):
+        """
+        Trigger LED strip for a bit
+        """
+        print(f'{self.pin} changing LED color to {self.active_color}')
+        self.led_strip.target_base_color = self.active_color
+        self.led_strip.target_pixel = self.led_strip.num_pix - 2
 
-        print(f'[{sound_file!r} exited with {proc.returncode}]')
-        if stdout:
-            print(f'[stdout]\n{stdout.decode()}')
-        if stderr:
-            print(f'[stderr]\n{stderr.decode()}')
+        # GPIO.output(self.relay_output_pin, True)
+        await asyncio.sleep(self.relay_output_duration)
+        # GPIO.output(self.relay_output_pin, False)
+        self.led_strip.target_base_color = self.base_color
+        self.led_strip.target_pixel = 2
+
+        print(f'{self.pin} changing LED color to {self.base_color}')
 
     async def trigger_relay(self):
         """
@@ -152,15 +172,17 @@ class TouchPlay(object):
         else:
             sense_val = GPIO.input(self.pin)
 
-        if not sense_val and self.relay_output_pin:
-            event_loop.create_task(self.trigger_relay())
+        if not sense_val:
+
+            if self.relay_output_pin:
+                event_loop.create_task(self.trigger_relay())
+            if self.led_enabled:
+                event_loop.create_task(self.trigger_led())
 
         self.process_audio_signal(sense_val)
 
     def process_audio_signal(self, sense_val):
-        """
-        :return: Check GPIO and play sounds, signal of 0 is active
-        """
+        """ Check GPIO and play sounds, signal of 0 is active """
         #print(str(self.pin) + " " + str(GPIO.input(self.pin))   + "  pos: " + str(self.pos)  + " " + str(self.iter))
         #self.iter += 1
 
@@ -218,6 +240,8 @@ class TouchPlay(object):
                     self.lastTime = now
 
 
+
+
     def check(self):
 
         #print str(self.pin) + " " + str(GPIO.input(self.pin))   + "  pos: " + str(self.pos)  + " " + str(self.iter)
@@ -232,7 +256,6 @@ class TouchPlay(object):
                 self.playing = False
                 self.pos = 0
                 self.startTime = None
-
 
         if senseVal == 0:
             #print "on"
