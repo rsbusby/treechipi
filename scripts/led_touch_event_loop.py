@@ -182,7 +182,7 @@ if __name__ == '__main__':
 
     # get configuration
     # read file
-    with open('/home/pi/treechipi/treechipi/config_04.json', 'r') as myfile:
+    with open('/home/pi/treechipi/treechipi/config_05.json', 'r') as myfile:
         data = myfile.read()
 
     # parse file
@@ -199,7 +199,7 @@ if __name__ == '__main__':
     # for tp in touchSensors:
     #     tp.base_color = rand_base_color
 
-    strip = get_default_tree_strip(data_pin=18, num_pixels=100)
+    strip = get_default_tree_strip(data_pin=18, num_pixels=200)
     strip.begin()
     print("LED strip initialized...\n")
     strip.base_color = touchSensors[0].base_color

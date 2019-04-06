@@ -19,7 +19,7 @@ tc = Box()
 
 # touch
 
-for pin_index in range(0, 1):
+for pin_index in range(0, 2):
     index = pin_index + 1
 
     tc = deepcopy(tc)
@@ -46,13 +46,13 @@ t1.active_color_string = 'purple'
 try:
     t2 = touch_config_list[1]
     t2.led_enabled = True
-    t2.active_color_rgb = (0, 40, 40)
+    t2.active_color_rgb = (0, 4, 40)
 except:
     pass
 
 
 # proximity
-for pin_index in range(0, 1):
+for pin_index in range(0, 2):
 
     tc = deepcopy(tc)
 
@@ -72,6 +72,13 @@ for pin_index in range(0, 1):
     tc.mock = mock_val
     tc.mock_period = 14
     touch_config_list.append(tc)
+
+# try:
+#     p2 = touch_config_list[-1]
+#     p2.led_enabled = False
+#
+# except Exception as e:
+#     pass
 
 # touch_config_list.append(t1b)
 #
@@ -129,5 +136,5 @@ for pin_index in range(0, 1):
 
 json_string = json.dumps([b.to_dict() for b in touch_config_list], indent=True)
 
-with open('/home/pi/treechipi/treechipi/config_04.json', 'w') as myfile:
+with open('/home/pi/treechipi/treechipi/config_05.json', 'w') as myfile:
     myfile.write(json_string)
