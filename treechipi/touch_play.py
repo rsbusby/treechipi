@@ -45,12 +45,15 @@ class TouchPlay(object):
         # relay output
         self.relay_output_pin = None
         self.relay_output_duration = 2
+        self.relay_active = False
+
 
         # LED output
         self.led_enabled = False
         self.led_strip = None
         self.base_color = red
         self.active_color = purple
+        self.led_active = False
 
         # testing
         self.mock = True
@@ -129,10 +132,13 @@ class TouchPlay(object):
         print(f'{self.pin} changing LED color to {self.active_color}')
         self.led_strip.target_base_color = self.active_color
         self.led_strip.target_pixel = self.led_strip.num_pix - 2
+        self.led_active = True
 
         # GPIO.output(self.relay_output_pin, True)
         await asyncio.sleep(self.relay_output_duration)
+
         # GPIO.output(self.relay_output_pin, False)
+        self.led_active = False
         self.led_strip.target_base_color = self.base_color
         self.led_strip.target_pixel = 2
 
@@ -174,9 +180,9 @@ class TouchPlay(object):
 
         if not sense_val:
 
-            if self.relay_output_pin:
+            if self.relay_output_pin and not self.relay_active:
                 event_loop.create_task(self.trigger_relay())
-            if self.led_enabled:
+            if self.led_enabled and not self.led_active:
                 event_loop.create_task(self.trigger_led())
 
         self.process_audio_signal(sense_val)

@@ -63,6 +63,10 @@ class TreeStrip(Adafruit_NeoPixel):
         return (red, green, blue)
 
     @staticmethod
+    def rgb_to_color(rgb_tuple):
+        return Color(int(rgb_tuple[0]), int(rgb_tuple[1]), int(rgb_tuple[2]))
+
+    @staticmethod
     def fade_into_color_from_24bit(c1, c2, fade_rate):
 
         rgb_1 = np.array(TreeStrip.rgb_components(c1))
@@ -85,6 +89,27 @@ class TreeStrip(Adafruit_NeoPixel):
 
         new_color = Color(rgb_tuple[0], rgb_tuple[1], rgb_tuple[2])
         return
+
+    @staticmethod
+    def limit_brightness_int(el):
+
+        if el > 255:
+            el = 255
+        elif el < 0:
+            el = 0
+        return el
+
+    @staticmethod
+    def limit_brightness(rgb_array):
+        return [TreeStrip.limit_brightness_int(el) for el in rgb_array]
+
+    @staticmethod
+    def boost_brightness(base_rgb, boost, boost_fac=3):
+        new_rgb = np.array(base_rgb) + int(boost * boost_fac)
+
+        new_rgb = TreeStrip.limit_brightness(new_rgb)
+
+        return new_rgb
 
     def set_pixel_color(self, pixel, color, reverse=False):
         if reverse:
@@ -180,8 +205,11 @@ class TreeStrip(Adafruit_NeoPixel):
             self.set_pixel_color(i, color)
 
     def update_base(self):
-        if self.target_base_color != self.base_color:
+        self.update_base_color()
+        #self.all_to_base(skip_active=True, show=False)
 
+    def update_base_color(self):
+        if self.target_base_color != self.base_color:
             if self.fade_base:
                 rgb_tuple = TreeStrip.fade_into_color_from_24bit(self.base_color,
                                                                  self.target_base_color,
@@ -189,8 +217,6 @@ class TreeStrip(Adafruit_NeoPixel):
                 self.base_color = Color(int(rgb_tuple[0]), int(rgb_tuple[1]), int(rgb_tuple[2]))
             else:
                 self.base_color = self.target_base_color
-
-            self.all_to_base(skip_active=True, show=False)
 
     def update(self):
 
@@ -228,3 +254,29 @@ class TreeStrip(Adafruit_NeoPixel):
         self.update_base()
 
         self.show()
+
+    def update_new(self):
+
+        """
+        mimic Arduino code from TreeChi.
+        Loop through all pixels.
+        Around the active pixel, bump up the brightness.
+
+
+        """
+
+        self.update_base_color()
+
+        base_rgb = TreeStrip.rgb_components(self.base_color)
+        for i in range(self.num_pix):
+
+            pulse_width = 6
+            active_diff = np.abs(i - self.active_pixel)
+            if active_diff < pulse_width:
+                boost = pulse_width - active_diff
+                rgb_color = TreeStrip.boost_brightness(base_rgb, boost)
+                color = TreeStrip.rgb_to_color(rgb_color)
+            else:
+                color = self.base_color
+
+            self.set_pixel_color(pixel=i, color=color)
