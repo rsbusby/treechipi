@@ -32,6 +32,9 @@ def create_from_box(b):
     :param
     :return:
     """
+
+    print(f'Setting up input sensor for pin {b.pin}')
+
     touch_play = TouchPlay(b.pin, files_from_dir(b.dir), timeout=b.timeout, sustain=b.sustain)
     touch_play.minimum_interval = b.minimum_interval
     touch_play.relay_output_pin = b.relay_output_pin
@@ -70,11 +73,12 @@ def create_from_box(b):
 
     return touch_play
 
+
 class TouchPlay(object):
 
     def __init__(self, pin, fileList, duration = None, timeout=20, sustain=False, vol=0):
 
-        self.verbosity = 0
+        self.verbosity = 1
         self.fileList = fileList
         self.pin = pin
         self.timeout = timeout
@@ -82,7 +86,7 @@ class TouchPlay(object):
         self.minimum_interval = None
         self.vol = vol
         if self.vol:
-            self.volOpt = " --vol " + str(vol)
+            self.volOpt = f" --vol {self.vol}"
         else:
             self.volOpt = ''
         self.fileDict = {}
@@ -99,6 +103,7 @@ class TouchPlay(object):
         self.length = None
 
         # relay output
+        self.relay_enabled = True
         self.relay_output_pin = None
         self.relay_output_duration = 2
         self.relay_active = False
@@ -117,7 +122,7 @@ class TouchPlay(object):
         self.event_loop = None
 
     def get_length(self, soundFile):
-        sound1 = AudioSegment.from_file(soundFile, format="aiff")
+        sound1 = AudioSegment.from_file(soundFile, format="wav")
         length = sound1.duration_seconds
         print(f"Length of {soundFile} in seconds is {length:.1f}")
         return length
@@ -184,13 +189,24 @@ class TouchPlay(object):
         """
         Trigger LED strip for a bit
         """
+        self.led_on()
+        await asyncio.sleep(self.relay_output_duration)
+        self.led_off()
+
+    def led_on(self):
+        """
+        Trigger LED strip on
+        """
         print(f'{self.pin} LED is active! color to {self.active_color}')
         self.led_strip.target_base_color = self.active_color
         self.led_strip.target_pixel = self.led_strip.num_pix - 2
         self.led_active = True
         self.led_strip.is_active = True
 
-        await asyncio.sleep(self.relay_output_duration)
+    def led_off(self):
+        """
+        Trigger LED strip off
+        """
 
         self.led_active = False
         self.led_strip.is_active = False
@@ -203,10 +219,14 @@ class TouchPlay(object):
         """
         Trigger relay for a bit
         """
-        print(f'{self.pin} starting relay on output pin {self.relay_output_pin}')
+        self.relay_active = True
         GPIO.output(self.relay_output_pin, True)
+        print(f'{self.pin} starting relay on output pin {self.relay_output_pin}')
+
         await asyncio.sleep(self.relay_output_duration)
+
         GPIO.output(self.relay_output_pin, False)
+        self.relay_active = False
         print(f'{self.pin} stopping relay on output pin {self.relay_output_pin}')
 
     def check_new(self, event_loop):
@@ -223,8 +243,8 @@ class TouchPlay(object):
                 return
             else:
                 if self.verbosity:
-                    print(f"{self.pin} processing, {interval_seconds} {self.minimum_interval}")
-
+                    #print(f"{self.pin} processing, {interval_seconds} {self.minimum_interval}")
+                    pass
 
         print(f"checking {self.pin}")
         if self.mock:
@@ -235,14 +255,47 @@ class TouchPlay(object):
             sense_val = GPIO.input(self.pin)
             print(f"{self.pin}  p {sense_val}  {randint(90,99)}")
 
-        if False: #not sense_val:
+        if sense_val and self.led_enabled and self.led_active:
+            self.led_off()
+
+        if not sense_val:
+            # sensor is active
             print("TEST")
             if self.relay_output_pin and not self.relay_active:
                 event_loop.create_task(self.trigger_relay())
             if self.led_enabled and not self.led_active and not self.led_strip.is_active:
                 event_loop.create_task(self.trigger_led())
+                self.led_on()
 
-        #self.process_audio_signal(sense_val)
+        self.process_audio_signal(sense_val)
+
+    def start_sound(self, start_time):
+
+        if self.pos <= 0 or self.pos >= self.length:
+            self.wavFile = self.get_file()
+            self.set_length()
+        if self.wavFile:
+            if self.pos <= 0 and not self.sustain:
+                #cmd = f'omxplayer --vol -1000 -o alsa:hw:1,0 {self.wavFile} &'
+                cmd = f'aplay -D sysdefault:CARD=1 {self.wavFile} &'
+                print(cmd)
+                os.system(cmd)
+                print(f"{self.pin} starting sound {self.wavFile}")  # + str(self.iter))
+            else:
+                posOpt = ''
+                if self.pos:
+                    posOpt = f" --pos {self.pos}"
+                outStr = " > /dev/null 2>&1 "
+                cmd_omx = "omxplayer --no-osd " + self.wavFile + " " + posOpt + self.volOpt + outStr + " &"
+                cmd_aplay = f'aplay -D sysdefault:CARD=1 {self.wavFile} &'
+                os.system(cmd_aplay)
+                print(f"{self.pin} starting {self.wavFile} , for {self.length} seconds")  # + str(self.iter)
+                # adjust pos because omxplayer takes a while to start
+                self.pos = self.pos - 1.5
+            # now = datetime.now()
+            self.lastTime = start_time
+            self.playing = True
+            self.startTime = start_time
 
     def process_audio_signal(self, sense_val):
         """ Check GPIO and play sounds, signal of 0 is active """
@@ -251,6 +304,8 @@ class TouchPlay(object):
 
         # get time
         now = datetime.now()
+
+        # set state to not playing, if sound is done
         if self.playing:
             delta = now - self.startTime
             if delta.total_seconds() > self.length:
@@ -258,39 +313,44 @@ class TouchPlay(object):
                 self.pos = 0
                 self.startTime = None
 
-        # if signal present
-
+        # process input
         if sense_val == 0:
+            # input is active
             print("on")
             if not self.playing:
-                if self.pos <= 0 or self.pos >= self.length:
-                    self.wavFile = self.get_file()
-                    self.set_length()
-                if self.wavFile:
-                    if self.pos <= 0 and not self.sustain:
-                        os.system("omxplayer " + self.wavFile + " &")
-                        print(f"{self.pin} starting aplay {self.wavFile}")  # + str(self.iter))
-                    else:
-                        posOpt = ''
-                        if self.pos:
-                            posOpt = f" --pos {self.pos}"
-                        outStr = " > /dev/null 2>&1 "
-                        os.system("omxplayer --no-osd " + self.wavFile + " " + posOpt + self.volOpt + outStr + " &")
-                        print(f"{self.pin} starting {self.wavFile} with omx, for {self.length} seconds")  # + str(self.iter)
-                        # adjust pos because omxplayer takes a while to start
-                        self.pos = self.pos - 1.5
-                    # now = datetime.now()
+                self.start_sound(start_time=now)
+                # if self.pos <= 0 or self.pos >= self.length:
+                #     self.wavFile = self.get_file()
+                #     self.set_length()
+                # if self.wavFile:
+                #     if self.pos <= 0 and not self.sustain:
+                #         os.system("omxplayer " + self.wavFile + " &")
+                #         print(f"{self.pin} starting aplay {self.wavFile}")  # + str(self.iter))
+                #     else:
+                #         posOpt = ''
+                #         if self.pos:
+                #             posOpt = f" --pos {self.pos}"
+                #         outStr = " > /dev/null 2>&1 "
+                #         os.system("omxplayer --no-osd " + self.wavFile + " " + posOpt + self.volOpt + outStr + " &")
+                #         print(f"{self.pin} starting {self.wavFile} with omx, for {self.length} seconds")  # + str(self.iter)
+                #         # adjust pos because omxplayer takes a while to start
+                #         self.pos = self.pos - 1.5
+                #     # now = datetime.now()
+                #     self.lastTime = now
+                #     self.playing = True
+                #     self.startTime = now
+
+            else:  # self.playing == True
+                # already playing, keep going
+                # update the sustain if needed
+                if self.sustain:
                     self.lastTime = now
-                    self.playing = True
-                    self.startTime = now
 
-            else:
-                print(f"{self.pin} {self.wavFile} still playing")
-
-            if self.playing and self.sustain:
-                self.lastTime = now
+                if self.verbosity:
+                    print(f"{self.pin} {self.wavFile} still playing")
 
         else:  # senseVal == 1:
+            # input is not active
             # If sustaining, but no recent trigger, then stop sound.
             if self.sustain and self.playing:
                 # now = datetime.now()
@@ -301,5 +361,3 @@ class TouchPlay(object):
                     self.kill_sound()
                     print(f"{self.pin} killed at {self.pos}")
                     self.lastTime = now
-
-

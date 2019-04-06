@@ -59,7 +59,7 @@ def files_from_dir(d, wd=None):
 
 
 touchSensors = []
-p1 = TouchPlay(prox_input_pins[0], files_from_dir('p1'), timeout=999, sustain=True)
+#p1 = TouchPlay(prox_input_pins[0], files_from_dir('p1'), timeout=999, sustain=True)
 #p2 = TouchPlay(16, filesFromDir('p2'), timeout=20, sustain=True)
 
 shared_base_color = Color(55, 0, 0)
@@ -161,11 +161,11 @@ touch_check_interval = 0.3333
 led_update_interval = 0.01
 
 
-async def touch_check(event_loop):
+async def touch_check(event_loop, touch_sensor_list):
     while True:
         await asyncio.sleep(touch_check_interval)
         print("Checking touch pins")
-        for s in touchSensors:
+        for s in touch_sensor_list:
             s.check_new(event_loop)
 
 
@@ -189,8 +189,9 @@ if __name__ == '__main__':
     config_dict_list = json.loads(data)
     config_box_list = [Box(d) for d in config_dict_list]
     touchSensors = [create_from_box(b) for b in config_box_list]
-    touchSensors.append(p1)
+    #touchSensors.append(p1)
     print(len(touchSensors))
+
 
     # rand_rgb = (randint(0, 66), randint(0, 5), randint(0, 100))
     # print(f'\n\nrandom base: {rand_rgb}')
@@ -212,7 +213,7 @@ if __name__ == '__main__':
     try:
         print('task creation started...')
         loop.create_task(ongoing_update(strip))
-        loop.create_task(touch_check(loop))
+        loop.create_task(touch_check(loop, touch_sensor_list=touchSensors))
         loop.run_forever()
     finally:
         loop.close()

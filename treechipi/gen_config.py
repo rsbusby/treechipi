@@ -11,6 +11,9 @@ relay_output_pins = [5, 6, 13, 19, 10, 9]
 shared_base_color_rgb = (0, 40, 12)
 
 touch_config_list = []
+prox_config_list = []
+
+mock_val = False
 
 tc = Box()
 
@@ -18,17 +21,21 @@ tc = Box()
 
 for pin_index in range(0, 1):
     index = pin_index + 1
+
+    tc = deepcopy(tc)
+
+    tc.vol = -2000
     tc.pin = touch_input_pins[pin_index]
     tc.dir = f't{index}'
     tc.timeout = 5
     tc.sustain = False
-    tc.minimum_interval = 10
+    tc.minimum_interval = 2
     tc.relay_output_pin = relay_output_pins[pin_index]
-    tc.relay_output_duration = 6
+    tc.relay_output_duration = 5
     tc.led_enabled = False
     tc.base_color = shared_base_color_rgb
     tc.active_color_rgb = (0, 0, 77)
-    tc.mock = False
+    tc.mock = mock_val
     tc.mock_period = 20
     touch_config_list.append(tc)
 
@@ -43,6 +50,28 @@ try:
 except:
     pass
 
+
+# proximity
+for pin_index in range(0, 1):
+
+    tc = deepcopy(tc)
+
+    index = pin_index + 1
+
+    tc.vol = -2000
+    tc.pin = prox_input_pins[pin_index]
+    tc.dir = f'p{index}'
+    tc.timeout = 12
+    tc.sustain = True
+    tc.minimum_interval = 2
+    tc.relay_output_pin = None #relay_output_pins[pin_index]
+    tc.relay_output_duration = None
+    tc.led_enabled = False
+    tc.base_color = shared_base_color_rgb
+    tc.active_color_rgb = (0, 0, 77)
+    tc.mock = mock_val
+    tc.mock_period = 14
+    touch_config_list.append(tc)
 
 # touch_config_list.append(t1b)
 #
