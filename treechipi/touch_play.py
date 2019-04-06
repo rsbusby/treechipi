@@ -39,10 +39,31 @@ def create_from_box(b):
 
     touch_play.led_enabled = b.led_enabled
 
-    br = b.get('base_color', (22, 0, 0))
-    touch_play.base_color = TreeStrip.rgb_to_color(br)
-    ar = b.get('active_color', (0, 33, 0))
-    touch_play.active_color = TreeStrip.rgb_to_color(ar)
+    br = None
+    bcs = b.get('base_color_string', None)
+    if bcs:
+        try:
+            br = webcolors.name_to_rgb(bcs)
+        except:
+            print(f"color {bcs} not found")
+            br = None
+    if not br:
+        br = b.get('base_color_rgb', None)
+    if br:
+        touch_play.base_color = TreeStrip.rgb_to_color(br)
+
+    ar = None
+    acs = b.get('active_color_string', None)
+    if acs:
+        try:
+            ar = webcolors.name_to_rgb(acs)
+        except:
+            print(f"color {acs} not found")
+            ar = None
+    if not ar:
+        ar = b.get('active_color_rgb', None)
+    if ar:
+        touch_play.active_color = TreeStrip.rgb_to_color(ar)
 
     touch_play.mock = b.get('mock', True)
     touch_play.mock_period = b.get('mock_period', 20)

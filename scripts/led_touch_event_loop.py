@@ -3,6 +3,12 @@ import RPi.GPIO as GPIO
 import asyncio
 import os
 import sys
+import json
+from random import randint
+
+from box import Box
+
+
 
 # local imports
 #sys.path.insert(0, "../treechipi")
@@ -11,7 +17,7 @@ import sys
 
 from neopixel import *
 from treechipi.touch_play import TouchPlay, create_from_box
-from treechipi.tree_strip import get_default_tree_strip
+from treechipi.tree_strip import get_default_tree_strip, TreeStrip
 
 debug = True
 
@@ -51,7 +57,6 @@ p1 = TouchPlay(5, files_from_dir('p1'), timeout=999, sustain=True)
 
 shared_base_color = Color(55, 0, 0)
 
-# from box import Box
 # b = Box()
 # b.pin = touch_input_pins[0]
 # b.dir = 't1'
@@ -132,11 +137,11 @@ shared_base_color = Color(55, 0, 0)
 # touchSensors.append(p4)
 
 
-from treechipi.config_test import touch_config_list
+#from treechipi.config_test import touch_config_list
 
-touchSensors = [create_from_box(b) for b in touch_config_list]
+#touchSensors = [create_from_box(b) for b in touch_config_list]
 
-touchSensors.append(p1)
+#touchSensors.append(p1)
 
 
 # touchSensors.append(t1)
@@ -170,11 +175,27 @@ async def ongoing_update(strip):
 if __name__ == '__main__':
 
 
+    # get configuration
+    # read file
+    with open('/home/pi/treechipi/treechipi/config_03.json', 'r') as myfile:
+        data = myfile.read()
+
+    # parse file
+    config_dict_list = json.loads(data)
+    config_box_list = [Box(d) for d in config_dict_list]
+    touchSensors = [create_from_box(b) for b in config_box_list]
+    touchSensors.append(p1)
+
+    # rand_rgb = (randint(0, 66), randint(0, 5), randint(0, 100))
+    # print(f'\n\nrandom base: {rand_rgb}')
+    # rand_base_color = TreeStrip.rgb_to_color(rand_rgb)
+    # for tp in touchSensors:
+    #     tp.base_color = rand_base_color
 
     strip = get_default_tree_strip(data_pin=18, num_pixels=100)
     strip.begin()
-    print("OK")
-
+    print("LED strip initialized...\n")
+    strip.base_color = touchSensors[0].base_color
     strip.all_to_base(skip_active=False, show=True)
 
     for tp in touchSensors:
