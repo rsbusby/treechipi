@@ -37,9 +37,15 @@ class TreeStrip(Adafruit_NeoPixel):
 
     def __init__(self, *args, **kwargs):
         super(TreeStrip, self).__init__(*args, **kwargs)
-        self.base_color = dark_orange  # Color(22, 0, 3)
+
+        self.verbosity = 0
+
+        self.base_color = Color(44, 99, 0) #dark_orange  # Color(22, 0, 3)
         self.active_color = orange
         self.num_pix = self.numPixels()
+
+        self.pulse_width = 10
+        self.boost_factor = 20
 
         self.previous_index = 0
         self.target_pixel = 0
@@ -104,10 +110,13 @@ class TreeStrip(Adafruit_NeoPixel):
         return [TreeStrip.limit_brightness_int(el) for el in rgb_array]
 
     @staticmethod
-    def boost_brightness(base_rgb, boost, boost_fac=3):
+    def boost_brightness(base_rgb, boost, boost_fac=30):
         new_rgb = np.array(base_rgb) + int(boost * boost_fac)
 
         new_rgb = TreeStrip.limit_brightness(new_rgb)
+
+
+        #print(f'old: {base_rgb}\nnew: {new_rgb}\n\n')
 
         return new_rgb
 
@@ -210,15 +219,17 @@ class TreeStrip(Adafruit_NeoPixel):
 
     def update_base_color(self):
         if self.target_base_color != self.base_color:
+            print("Base color changed!")
             if self.fade_base:
                 rgb_tuple = TreeStrip.fade_into_color_from_24bit(self.base_color,
                                                                  self.target_base_color,
                                                                  fade_rate=self.base_target_approach_rate)
                 self.base_color = Color(int(rgb_tuple[0]), int(rgb_tuple[1]), int(rgb_tuple[2]))
             else:
+                print(f'changin to {self.target_base_color} from {self.base_color}')
                 self.base_color = self.target_base_color
 
-    def update(self):
+    def update_old(self):
 
         if self.active_pixel != self.target_pixel:
             #print(f"traget {self.target_pixel}   {self.active_pixel}")
@@ -255,7 +266,7 @@ class TreeStrip(Adafruit_NeoPixel):
 
         self.show()
 
-    def update_new(self):
+    def update(self):
 
         """
         mimic Arduino code from TreeChi.
@@ -265,18 +276,40 @@ class TreeStrip(Adafruit_NeoPixel):
 
         """
 
+
+        #print("update new!")
         self.update_base_color()
+
+        #self.all_to_base()
+
+        if self.active_pixel != self.target_pixel:
+            # print(f"traget {self.target_pixel}   {self.active_pixel}")
+            # move one
+            self.previous_index = self.active_pixel
+            self.old_pixel_stack.appendleft(self.active_pixel)
+
+            pdiff = self.target_pixel - self.active_pixel
+
+            if pdiff > 0:
+                self.active_pixel = self.active_pixel + 1
+            else:
+                self.active_pixel = self.active_pixel - 1
 
         base_rgb = TreeStrip.rgb_components(self.base_color)
         for i in range(self.num_pix):
 
-            pulse_width = 6
+            pulse_width = self.pulse_width
             active_diff = np.abs(i - self.active_pixel)
             if active_diff < pulse_width:
                 boost = pulse_width - active_diff
-                rgb_color = TreeStrip.boost_brightness(base_rgb, boost)
+                rgb_color = TreeStrip.boost_brightness(base_rgb, boost, self.boost_factor)
                 color = TreeStrip.rgb_to_color(rgb_color)
             else:
                 color = self.base_color
 
             self.set_pixel_color(pixel=i, color=color)
+
+        if self.verbosity:
+            print(f"done update, {self.active_pixel}")
+
+        self.show()

@@ -47,7 +47,6 @@ class TouchPlay(object):
         self.relay_output_duration = 2
         self.relay_active = False
 
-
         # LED output
         self.led_enabled = False
         self.led_strip = None
@@ -129,7 +128,7 @@ class TouchPlay(object):
         """
         Trigger LED strip for a bit
         """
-        print(f'{self.pin} changing LED color to {self.active_color}')
+        print(f'{self.pin} LED is active! color to {self.active_color}')
         self.led_strip.target_base_color = self.active_color
         self.led_strip.target_pixel = self.led_strip.num_pix - 2
         self.led_active = True
@@ -142,7 +141,7 @@ class TouchPlay(object):
         self.led_strip.target_base_color = self.base_color
         self.led_strip.target_pixel = 2
 
-        print(f'{self.pin} changing LED color to {self.base_color}')
+        print(f'{self.pin} LED is inactive, color to {self.base_color}')
 
     async def trigger_relay(self):
         """
@@ -244,62 +243,3 @@ class TouchPlay(object):
                     self.kill_sound()
                     print(f"{self.pin} killed at {self.pos}")
                     self.lastTime = now
-
-
-
-
-    def check(self):
-
-        #print str(self.pin) + " " + str(GPIO.input(self.pin))   + "  pos: " + str(self.pos)  + " " + str(self.iter)
-        #self.iter += 1
-
-        senseVal = GPIO.input(self.pin)
-     	# if signal present
-        now = datetime.now()
-        if self.playing:
-            delta = now - self.startTime
-            if delta.total_seconds() > self.length:
-                self.playing = False
-                self.pos = 0
-                self.startTime = None
-
-        if senseVal == 0:
-            #print "on"
-            if not self.playing:
-                if self.pos <= 0 or self.pos >= self.length:
-                    self.wavFile = self.get_file()
-                    self.set_length()
-                if self.wavFile:
-                    if self.pos <= 0 and not self.sustain:
-                        os.system("aplay " + self.wavFile + " &")
-                        print("starting " + self.wavFile + " ") #+ str(self.iter))
-                    else:
-                        posOpt = ''
-                        if self.pos:
-                            posOpt = " --pos " + str(self.pos)
-                        outStr = " > /dev/null 2>&1 "
-                        os.system("omxplayer --no-osd " + self.wavFile + " " + posOpt + self.volOpt + outStr + " &")
-                        print("starting " + self.wavFile + " with omx ") #+ str(self.iter)
-                        # adjust pos because omxplayer takes a while to start
-                        self.pos = self.pos - 1.5
-                    #now = datetime.now()
-                    self.lastTime = now
-                    self.playing = True
-                    self.startTime = now
-
-            if self.playing and self.sustain:
-                self.lastTime = now
-
-        else: # senseVal == 1:
-            # If sustaining, but no recent trigger, then stop sound.
-            if self.sustain and self.playing:
-                #now = datetime.now()
-                delta = now - self.lastTime
-                #print str(self.pin) + " " + str(self.timeout - delta.total_seconds())
-                if delta.total_seconds() > self.timeout:
-                    self.append_pos(delta)
-                    self.kill_sound()
-                    print(str(self.pin) + " killed at " + str(self.pos))
-                    self.lastTime = now
-
-
