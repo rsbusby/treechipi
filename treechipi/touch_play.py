@@ -310,8 +310,6 @@ class TouchPlay(object):
 
     def process_audio_signal(self, sense_val):
         """ Check GPIO and play sounds, signal of 0 is active """
-        #print(str(self.pin) + " " + str(GPIO.input(self.pin))   + "  pos: " + str(self.pos)  + " " + str(self.iter))
-        #self.iter += 1
 
         # get time
         now = datetime.now()
