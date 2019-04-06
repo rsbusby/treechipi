@@ -8,7 +8,8 @@ touch_input_pins = [23, 12, 20, 27, 7, 14]
 prox_input_pins = [24, 16, 21, 22, 8, 15]
 relay_output_pins = [5, 6, 13, 19, 10, 9]
 
-shared_base_color_rgb = (0, 40, 12)
+shared_base_color_rgb = (4, 0, 32)
+shared_base_color_string = None
 
 touch_config_list = []
 prox_config_list = []
@@ -19,7 +20,7 @@ tc = Box()
 
 # touch
 
-for pin_index in range(0, 2):
+for pin_index in range(0, 5):
     index = pin_index + 1
 
     tc = deepcopy(tc)
@@ -30,10 +31,10 @@ for pin_index in range(0, 2):
     tc.timeout = 5
     tc.sustain = False
     tc.minimum_interval = 2
-    tc.relay_output_pin = relay_output_pins[pin_index]
+    tc.relay_output_pin = None
     tc.relay_output_duration = 5
     tc.led_enabled = False
-    tc.base_color = shared_base_color_rgb
+    tc.base_color_rgb = shared_base_color_rgb
     tc.active_color_rgb = (0, 0, 77)
     tc.mock = mock_val
     tc.mock_period = 20
@@ -41,18 +42,40 @@ for pin_index in range(0, 2):
 
 t1 = touch_config_list[0]
 t1.led_enabled = True
-t1.active_color_string = 'purple'
+t1.active_color_rgb =  (0, 0, 77)
 
 try:
     t2 = touch_config_list[1]
     t2.led_enabled = True
-    t2.active_color_rgb = (0, 4, 40)
+    t2.active_color_string = None
+    t2.active_color_rgb = (40, 1, 40)
+    t2.relay_output_pin = None
 except:
     pass
 
+try:
+    t3 = touch_config_list[2]
+    t3.led_enabled = False
+    t3.relay_output_pin = relay_output_pins[0]
+except:
+    pass
+
+try:
+    t4 = touch_config_list[3]
+    t4.led_enabled = False
+    t4.relay_output_pin = relay_output_pins[1]
+except:
+    pass
+
+try:
+    t5 = touch_config_list[4]
+    t5.led_enabled = False
+    t5.relay_output_pin = relay_output_pins[2]
+except:
+    pass
 
 # proximity
-for pin_index in range(0, 2):
+for pin_index in range(0, 5):
 
     tc = deepcopy(tc)
 
@@ -63,22 +86,25 @@ for pin_index in range(0, 2):
     tc.dir = f'p{index}'
     tc.timeout = 12
     tc.sustain = True
-    tc.minimum_interval = 2
-    tc.relay_output_pin = None #relay_output_pins[pin_index]
-    tc.relay_output_duration = None
+    tc.minimum_interval = 20
+    tc.relay_output_pin = None
+    tc.relay_output_duration = 4
     tc.led_enabled = False
     tc.base_color = shared_base_color_rgb
     tc.active_color_rgb = (0, 0, 77)
     tc.mock = mock_val
     tc.mock_period = 14
-    touch_config_list.append(tc)
+    prox_config_list.append(tc)
 
-# try:
-#     p2 = touch_config_list[-1]
-#     p2.led_enabled = False
-#
-# except Exception as e:
-#     pass
+try:
+    p2 = prox_config_list[1]
+except Exception as e:
+    pass
+
+try:
+    p3 = prox_config_list[2]
+except Exception as e:
+    pass
 
 # touch_config_list.append(t1b)
 #
@@ -133,6 +159,8 @@ for pin_index in range(0, 2):
 # t4b.relay_output_pin = relay_output_pins[pin_index]
 #
 # touch_config_list.append(t4b)
+
+touch_config_list += prox_config_list
 
 json_string = json.dumps([b.to_dict() for b in touch_config_list], indent=True)
 

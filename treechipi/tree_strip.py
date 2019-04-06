@@ -40,7 +40,7 @@ class TreeStrip(Adafruit_NeoPixel):
 
         self.verbosity = 0
 
-        self.base_color = Color(44, 0, 0) #dark_orange  # Color(22, 0, 3)
+        self.base_color = Color(4, 0, 32) #dark_orange  # Color(22, 0, 3)
         self.active_color = orange
         self.num_pix = self.numPixels()
 

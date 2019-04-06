@@ -33,7 +33,6 @@ def create_from_box(b):
     :return:
     """
 
-    print(f'Setting up input sensor for pin {b.pin}')
 
     touch_play = TouchPlay(b.pin, files_from_dir(b.dir), timeout=b.timeout, sustain=b.sustain)
     touch_play.minimum_interval = b.minimum_interval
@@ -71,6 +70,9 @@ def create_from_box(b):
     touch_play.mock = b.get('mock', True)
     touch_play.mock_period = b.get('mock_period', 20)
 
+    print(f'Setting up input sensor for pin {b.pin}, directory {b.dir}')
+    print(f'relay: {touch_play.relay_output_pin}')
+    print(f'led: {touch_play.led_enabled}')
     return touch_play
 
 
@@ -78,7 +80,7 @@ class TouchPlay(object):
 
     def __init__(self, pin, fileList, duration = None, timeout=20, sustain=False, vol=0):
 
-        self.verbosity = 1
+        self.verbosity = 0
         self.fileList = fileList
         self.pin = pin
         self.timeout = timeout
@@ -151,7 +153,8 @@ class TouchPlay(object):
             
     def kill_sound(self):
         """ stop playing """
-        print(f"Killing {self.wavFile}")
+        if self.verbosity:
+            print(f"Killing {self.wavFile}")
         #psOut = subprocess.check_output('ps -ax | grep ' + self.wavFile, stderr=subprocess.STDOUT, shell=True)
         p = subprocess.Popen(f'ps -ax | grep {self.wavFile}', shell=True, stdout=subprocess.PIPE)
         print(f'{self.pin} killing')
@@ -221,13 +224,15 @@ class TouchPlay(object):
         """
         self.relay_active = True
         GPIO.output(self.relay_output_pin, True)
-        print(f'{self.pin} starting relay on output pin {self.relay_output_pin}')
+        if self.verbosity:
+            print(f'{self.pin} starting relay on output pin {self.relay_output_pin}')
 
         await asyncio.sleep(self.relay_output_duration)
 
         GPIO.output(self.relay_output_pin, False)
         self.relay_active = False
-        print(f'{self.pin} stopping relay on output pin {self.relay_output_pin}')
+        if self.verbosity:
+            print(f'{self.pin} stopping relay on output pin {self.relay_output_pin}')
 
     def check_new(self, event_loop):
         """ signal of zero is active """
@@ -246,21 +251,23 @@ class TouchPlay(object):
                     #print(f"{self.pin} processing, {interval_seconds} {self.minimum_interval}")
                     pass
 
-        print(f"checking {self.pin}")
         if self.mock:
             sense_val = randint(0, self.mock_period)
         else:
             #sense_val = 1
             pass
             sense_val = GPIO.input(self.pin)
-            print(f"{self.pin}  p {sense_val}  {randint(90,99)}")
+            if self.verbosity:
+                print(f" Checking {self.pin}  val {sense_val} ")
 
         if sense_val and self.led_enabled and self.led_active:
             self.led_off()
 
         if not sense_val:
             # sensor is active
-            print("TEST")
+            if self.verbosity:
+                print(f'{self.pin} is active')
+
             if self.relay_output_pin and not self.relay_active:
                 event_loop.create_task(self.trigger_relay())
             if self.led_enabled and not self.led_active and not self.led_strip.is_active:
@@ -278,9 +285,12 @@ class TouchPlay(object):
             if self.pos <= 0 and not self.sustain:
                 #cmd = f'omxplayer --vol -1000 -o alsa:hw:1,0 {self.wavFile} &'
                 cmd = f'aplay -D sysdefault:CARD=1 {self.wavFile} &'
-                print(cmd)
+
                 os.system(cmd)
-                print(f"{self.pin} starting sound {self.wavFile}")  # + str(self.iter))
+
+                if self.verbosity:
+                    print(cmd)
+                    print(f"{self.pin} starting sound {self.wavFile}")  # + str(self.iter))
             else:
                 posOpt = ''
                 if self.pos:
