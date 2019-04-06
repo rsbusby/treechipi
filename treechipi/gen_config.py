@@ -16,7 +16,7 @@ tc = Box()
 
 # touch
 
-for pin_index in range(0, 6):
+for pin_index in range(0, 1):
     index = pin_index + 1
     tc.pin = touch_input_pins[pin_index]
     tc.dir = f't{index}'
@@ -28,7 +28,7 @@ for pin_index in range(0, 6):
     tc.led_enabled = False
     tc.base_color = shared_base_color_rgb
     tc.active_color_rgb = (0, 0, 77)
-    tc.mock = True
+    tc.mock = False
     tc.mock_period = 20
     touch_config_list.append(tc)
 
@@ -36,9 +36,12 @@ t1 = touch_config_list[0]
 t1.led_enabled = True
 t1.active_color_string = 'purple'
 
-t2 = touch_config_list[1]
-t2.led_enabled = True
-t2.active_color_rgb = (0, 40, 40)
+try:
+    t2 = touch_config_list[1]
+    t2.led_enabled = True
+    t2.active_color_rgb = (0, 40, 40)
+except:
+    pass
 
 
 # touch_config_list.append(t1b)
@@ -97,5 +100,5 @@ t2.active_color_rgb = (0, 40, 40)
 
 json_string = json.dumps([b.to_dict() for b in touch_config_list], indent=True)
 
-with open('/home/pi/treechipi/treechipi/config_03.json', 'w') as myfile:
+with open('/home/pi/treechipi/treechipi/config_04.json', 'w') as myfile:
     myfile.write(json_string)

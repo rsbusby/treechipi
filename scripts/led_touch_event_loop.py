@@ -26,24 +26,30 @@ debug = True
 GPIO.setmode(GPIO.BCM)
 GPIO.setwarnings(False)  # Disable Warnings
 
+# Set up  GPIO pins
+touch_input_pins = [23, 12, 20, 27, 7, 14]
+prox_input_pins = [24, 16, 21, 22, 8, 15]
+relay_output_pins = [5, 6, 13, 19, 10, 9]
+
 
 # Set up relay output GPIO pins and set them to off
-relay_output_pins = [22, 23, 24]
+#relay_output_pins = [22, 23, 24]
 for i in relay_output_pins:
     GPIO.setup(i, GPIO.OUT)
     GPIO.output(i, False)
 
 
 # Set up input GPIO pins
-touch_input_pins = [5, 7, 9, 11]
+#touch_input_pins = [5, 7, 9, 11]
 for pin in touch_input_pins:
     GPIO.setup(pin, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 
-prox_input_pins = [6, 8, 10, 12]
+#prox_input_pins = [6, 8, 10, 12]
 for pin in prox_input_pins:
     GPIO.setup(pin, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 
 sdir = '/home/pi/media'
+
 
 def files_from_dir(d, wd=None):
     if not wd:
@@ -51,8 +57,9 @@ def files_from_dir(d, wd=None):
     #print wd
     return [wd + '/' + d+'/'+ f for f in os.listdir(wd + '/' + d)]
 
+
 touchSensors = []
-p1 = TouchPlay(5, files_from_dir('p1'), timeout=999, sustain=True)
+p1 = TouchPlay(prox_input_pins[0], files_from_dir('p1'), timeout=999, sustain=True)
 #p2 = TouchPlay(16, filesFromDir('p2'), timeout=20, sustain=True)
 
 shared_base_color = Color(55, 0, 0)
@@ -162,8 +169,6 @@ async def touch_check(event_loop):
             s.check_new(event_loop)
 
 
-
-
 async def ongoing_update(strip):
     while True:
         await asyncio.sleep(led_update_interval)
@@ -177,7 +182,7 @@ if __name__ == '__main__':
 
     # get configuration
     # read file
-    with open('/home/pi/treechipi/treechipi/config_03.json', 'r') as myfile:
+    with open('/home/pi/treechipi/treechipi/config_04.json', 'r') as myfile:
         data = myfile.read()
 
     # parse file
@@ -185,6 +190,7 @@ if __name__ == '__main__':
     config_box_list = [Box(d) for d in config_dict_list]
     touchSensors = [create_from_box(b) for b in config_box_list]
     touchSensors.append(p1)
+    print(len(touchSensors))
 
     # rand_rgb = (randint(0, 66), randint(0, 5), randint(0, 100))
     # print(f'\n\nrandom base: {rand_rgb}')

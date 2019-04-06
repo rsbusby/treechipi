@@ -111,7 +111,7 @@ class TouchPlay(object):
         self.led_active = False
 
         # testing
-        self.mock = True
+        self.mock = False
         self.mock_period = 20
 
         self.event_loop = None
@@ -190,10 +190,8 @@ class TouchPlay(object):
         self.led_active = True
         self.led_strip.is_active = True
 
-        # GPIO.output(self.relay_output_pin, True)
         await asyncio.sleep(self.relay_output_duration)
 
-        # GPIO.output(self.relay_output_pin, False)
         self.led_active = False
         self.led_strip.is_active = False
         self.led_strip.target_base_color = self.base_color
@@ -206,14 +204,10 @@ class TouchPlay(object):
         Trigger relay for a bit
         """
         print(f'{self.pin} starting relay on output pin {self.relay_output_pin}')
-        #GPIO.output(self.relay_output_pin, True)
+        GPIO.output(self.relay_output_pin, True)
         await asyncio.sleep(self.relay_output_duration)
-        #GPIO.output(self.relay_output_pin, False)
+        GPIO.output(self.relay_output_pin, False)
         print(f'{self.pin} stopping relay on output pin {self.relay_output_pin}')
-
-    def trigger_relay_old(self):
-        print(f'{self.pin} triggering relay on output {self.relay_output_pin}')
-        #GPIO.output(self.relay_output_pin, True)
 
     def check_new(self, event_loop):
         """ signal of zero is active """
@@ -232,20 +226,23 @@ class TouchPlay(object):
                     print(f"{self.pin} processing, {interval_seconds} {self.minimum_interval}")
 
 
-        #print(f"checking {self.pin}")
+        print(f"checking {self.pin}")
         if self.mock:
             sense_val = randint(0, self.mock_period)
         else:
+            #sense_val = 1
+            pass
             sense_val = GPIO.input(self.pin)
+            print(f"{self.pin}  p {sense_val}  {randint(90,99)}")
 
-        if not sense_val:
-
+        if False: #not sense_val:
+            print("TEST")
             if self.relay_output_pin and not self.relay_active:
                 event_loop.create_task(self.trigger_relay())
             if self.led_enabled and not self.led_active and not self.led_strip.is_active:
                 event_loop.create_task(self.trigger_led())
 
-        self.process_audio_signal(sense_val)
+        #self.process_audio_signal(sense_val)
 
     def process_audio_signal(self, sense_val):
         """ Check GPIO and play sounds, signal of 0 is active """
