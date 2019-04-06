@@ -14,6 +14,6 @@ setup(
         'Programming Language :: Python :: 3',
     ],
     keywords=['RPI', 'GPIO', 'Raspberry Pi', 'LED'],
-    install_requires=['RPi.GPIO', 'webcolors', 'rpi_ws281x, asyncio'],
+    install_requires=['RPi.GPIO', 'webcolors', 'rpi_ws281x, asyncio', 'python-box'],
     zip_safe=False
 )

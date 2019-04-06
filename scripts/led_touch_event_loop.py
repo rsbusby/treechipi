@@ -1,17 +1,17 @@
 #!/usr/bin/env python3
-import os
 import RPi.GPIO as GPIO
 import asyncio
+import os
+import sys
 
 # local imports
-import sys
 #sys.path.insert(0, "../treechipi")
 #sys.path.insert(0, "../fancy")
 
 
 from neopixel import *
-from treechipi.touch_play import TouchPlay
-from treechipi.tree_strip import TreeStrip, get_default_tree_strip
+from treechipi.touch_play import TouchPlay, create_from_box
+from treechipi.tree_strip import get_default_tree_strip
 
 debug = True
 
@@ -22,65 +22,146 @@ GPIO.setwarnings(False)  # Disable Warnings
 
 
 # Set up relay output GPIO pins and set them to off
-relay_output_pins = [22, 23]
+relay_output_pins = [22, 23, 24]
 for i in relay_output_pins:
     GPIO.setup(i, GPIO.OUT)
     GPIO.output(i, False)
 
 
 # Set up input GPIO pins
-input_pins = [5, 6, 2, 3]
-for pin in input_pins:
+touch_input_pins = [5, 7, 9, 11]
+for pin in touch_input_pins:
     GPIO.setup(pin, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 
+prox_input_pins = [6, 8, 10, 12]
+for pin in prox_input_pins:
+    GPIO.setup(pin, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 
 sdir = '/home/pi/media'
 
-
-def filesFromDir(d, wd=None):
+def files_from_dir(d, wd=None):
     if not wd:
         wd = sdir
     #print wd
     return [wd + '/' + d+'/'+ f for f in os.listdir(wd + '/' + d)]
 
-
 touchSensors = []
-p1 = TouchPlay(5, filesFromDir('p1'), timeout=9, sustain=True)
+p1 = TouchPlay(5, files_from_dir('p1'), timeout=999, sustain=True)
 #p2 = TouchPlay(16, filesFromDir('p2'), timeout=20, sustain=True)
 
-# touch 2
-t2 = TouchPlay(17, filesFromDir('t2'), timeout=5, sustain=False)
-t2.minimum_interval = 2
-t2.relay_output_pin = relay_output_pins[0]
-t2.relay_output_duration = 5
+shared_base_color = Color(55, 0, 0)
 
-t2.led_enabled = True
-t2.base_color = Color(99, 0, 99)
-t2.active_color = Color(0, 92, 77)
+# from box import Box
+# b = Box()
+# b.pin = touch_input_pins[0]
+# b.dir = 't1'
+# b.timeout=5
+# b.sustain=False
+# b.minimum_interval = 10
+# b.relay_output_pin = relay_output_pins[0]
+# b.relay_output_duration = 6
+#
+# b.led_enabled = False
+# #b.base_color =
+# #b.active_color =
+#
+# b.mock = True
+# t1 = create_from_box(b=b)
+#
+# #
+# #
+# # # touch 1
+# # t1 = TouchPlay(touch_input_pins[0], files_from_dir('t1'), timeout=5, sustain=False)
+# # t1.minimum_interval = 2
+# # t1.relay_output_pin = relay_output_pins[0]
+# # t1.relay_output_duration = 5
+# #
+# # t1.led_enabled = False
+# # t1.base_color = shared_base_color #Color(99, 0, 99)
+# # t1.active_color = Color(92, 22, 0)
+# #
+# # if debug:
+# #     t1.mock = True
+# #     t1.mock_period = 20
+#
+# # touch 2
+# t2 = TouchPlay(touch_input_pins[1], files_from_dir('t2'), timeout=5, sustain=False)
+# t2.minimum_interval = 10
+# t2.relay_output_pin = relay_output_pins[0]
+# t2.relay_output_duration = 5
+#
+# t2.led_enabled = True
+# t2.base_color = shared_base_color #Color(99, 0, 99)
+# t2.active_color = Color(0, 0, 77)
+#
+# if debug:
+#     t2.mock = True
+#     t2.mock_period = 20
+#
+#
+# # touch 3
+# t3 = TouchPlay(touch_input_pins[2], files_from_dir('t3'), timeout=6, sustain=False)
+# t3.minimum_interval = 10
+# t3.relay_output_pin = relay_output_pins[2]
+# t3.relay_output_duration = 5
+#
+# t3.led_enabled = True
+# t3.base_color = shared_base_color #Color(99, 0, 0)
+# t3.active_color = Color(0, 55, 0)
+#
+# if debug:
+#     t3.mock = True
+#     t3.mock_period = 20
+#
+# # touch 4
+# t4 = TouchPlay(touch_input_pins[3], files_from_dir('t3'), timeout=6, sustain=False)
+# t4.minimum_interval = 10
+# t4.relay_output_pin = relay_output_pins[2]
+# t4.relay_output_duration = 5
+#
+# t4.led_enabled = False
+# #t4.base_color = shared_base_color #Color(99, 0, 0)
+# #t4.active_color = Color(0, 55, 0)
+#
+# if debug:
+#     t4.mock = True
+#     t4.mock_period = 20
 
-if debug:
-    t2.mock = True
-    t2.mock_period = 5
+# touchSensors.append(p2)
+# touchSensors.append(p3)
+# touchSensors.append(p4)
 
+
+from treechipi.config_test import touch_config_list
+
+touchSensors = [create_from_box(b) for b in touch_config_list]
 
 touchSensors.append(p1)
-touchSensors.append(t2)
+
+
+# touchSensors.append(t1)
+# touchSensors.append(t2)
+# touchSensors.append(t3)
+# touchSensors.append(t4)
+
+
+touch_check_interval = 0.3333
+led_update_interval = 0.01
 
 
 async def touch_check(event_loop):
     while True:
-        await asyncio.sleep(0.6)
+        await asyncio.sleep(touch_check_interval)
         print("Checking touch pins")
         for s in touchSensors:
             s.check_new(event_loop)
 
 
-led_update_period = 0.01
 
 
 async def ongoing_update(strip):
     while True:
-        await asyncio.sleep(led_update_period)
+        await asyncio.sleep(led_update_interval)
         #print(f"Updating strip {strip.base_color}")
         strip.update()
 
@@ -88,13 +169,16 @@ async def ongoing_update(strip):
 # Main program logic follows:
 if __name__ == '__main__':
 
+
+
     strip = get_default_tree_strip(data_pin=18, num_pixels=100)
     strip.begin()
     print("OK")
 
     strip.all_to_base(skip_active=False, show=True)
 
-    t2.led_strip = strip
+    for tp in touchSensors:
+        tp.led_strip = strip
 
     loop = asyncio.get_event_loop()
 
@@ -105,5 +189,5 @@ if __name__ == '__main__':
         loop.run_forever()
     finally:
         loop.close()
-        strip.base_color = Color(0, 0, 99)
+        strip.base_color = Color(0, 0, 22)
         strip.all_to_base()

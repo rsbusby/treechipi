@@ -45,7 +45,7 @@ class TreeStrip(Adafruit_NeoPixel):
         self.num_pix = self.numPixels()
 
         self.pulse_width = 10
-        self.boost_factor = 20
+        self.boost_factor = int(50.0 / self.pulse_width)
 
         self.previous_index = 0
         self.target_pixel = 0
@@ -60,6 +60,8 @@ class TreeStrip(Adafruit_NeoPixel):
         self.explode_color = name_to_color('aqua')
         self.next_explode_color = Color(0 ,0 ,5)
         self.exploding = False
+
+        self.is_active = False
 
     @staticmethod
     def rgb_components(color):
@@ -228,6 +230,9 @@ class TreeStrip(Adafruit_NeoPixel):
             else:
                 print(f'changin to {self.target_base_color} from {self.base_color}')
                 self.base_color = self.target_base_color
+            return True
+        else:
+            return False
 
     def update_old(self):
 
@@ -278,7 +283,7 @@ class TreeStrip(Adafruit_NeoPixel):
 
 
         #print("update new!")
-        self.update_base_color()
+        needs_update = self.update_base_color()
 
         #self.all_to_base()
 
@@ -294,22 +299,24 @@ class TreeStrip(Adafruit_NeoPixel):
                 self.active_pixel = self.active_pixel + 1
             else:
                 self.active_pixel = self.active_pixel - 1
+            needs_update = True
 
-        base_rgb = TreeStrip.rgb_components(self.base_color)
-        for i in range(self.num_pix):
+        if needs_update:
+            base_rgb = TreeStrip.rgb_components(self.base_color)
+            for i in range(self.num_pix):
 
-            pulse_width = self.pulse_width
-            active_diff = np.abs(i - self.active_pixel)
-            if active_diff < pulse_width:
-                boost = pulse_width - active_diff
-                rgb_color = TreeStrip.boost_brightness(base_rgb, boost, self.boost_factor)
-                color = TreeStrip.rgb_to_color(rgb_color)
-            else:
-                color = self.base_color
+                pulse_width = self.pulse_width
+                active_diff = np.abs(i - self.active_pixel)
+                if active_diff < pulse_width:
+                    boost = pulse_width - active_diff
+                    rgb_color = TreeStrip.boost_brightness(base_rgb, boost, self.boost_factor)
+                    color = TreeStrip.rgb_to_color(rgb_color)
+                else:
+                    color = self.base_color
 
-            self.set_pixel_color(pixel=i, color=color)
+                self.set_pixel_color(pixel=i, color=color)
 
-        if self.verbosity:
-            print(f"done update, {self.active_pixel}")
+            if self.verbosity:
+                print(f"done update, {self.active_pixel}")
 
-        self.show()
+            self.show()

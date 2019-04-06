@@ -14,11 +14,46 @@ from datetime import datetime
 import random
 
 from treechipi.tree_colors import *
+from treechipi.tree_strip import TreeStrip
 
+
+sdir = '/home/pi/media'
+
+
+def files_from_dir(d, wd=None):
+    if not wd:
+        wd = sdir
+    #print wd
+    return [wd + '/' + d+'/'+ f for f in os.listdir(wd + '/' + d)]
+
+
+def create_from_box(b):
+    """ Use python-box dict to set up an object
+    :param
+    :return:
+    """
+    touch_play = TouchPlay(b.pin, files_from_dir(b.dir), timeout=b.timeout, sustain=b.sustain)
+    touch_play.minimum_interval = b.minimum_interval
+    touch_play.relay_output_pin = b.relay_output_pin
+    touch_play.relay_output_duration = b.relay_output_duration
+
+    touch_play.led_enabled = b.led_enabled
+
+    br = b.get('base_color', (22, 0, 0))
+    touch_play.base_color = TreeStrip.rgb_to_color(br)
+    ar = b.get('active_color', (0, 33, 0))
+    touch_play.active_color = TreeStrip.rgb_to_color(ar)
+
+    touch_play.mock = b.get('mock', True)
+    touch_play.mock_period = b.get('mock_period', 20)
+
+    return touch_play
 
 class TouchPlay(object):
 
     def __init__(self, pin, fileList, duration = None, timeout=20, sustain=False, vol=0):
+
+        self.verbosity = 0
         self.fileList = fileList
         self.pin = pin
         self.timeout = timeout
@@ -132,12 +167,14 @@ class TouchPlay(object):
         self.led_strip.target_base_color = self.active_color
         self.led_strip.target_pixel = self.led_strip.num_pix - 2
         self.led_active = True
+        self.led_strip.is_active = True
 
         # GPIO.output(self.relay_output_pin, True)
         await asyncio.sleep(self.relay_output_duration)
 
         # GPIO.output(self.relay_output_pin, False)
         self.led_active = False
+        self.led_strip.is_active = False
         self.led_strip.target_base_color = self.base_color
         self.led_strip.target_pixel = 2
 
@@ -166,12 +203,15 @@ class TouchPlay(object):
             interval_seconds = interval.seconds
 
             if not (interval_seconds > self.minimum_interval):
-                print(f"{self.pin} pin waiting {self.minimum_interval - interval_seconds}")
+                if self.verbosity:
+                    print(f"{self.pin} pin waiting {self.minimum_interval - interval_seconds}")
                 return
             else:
-                print(f"{self.pin} processing, {interval_seconds} {self.minimum_interval}")
+                if self.verbosity:
+                    print(f"{self.pin} processing, {interval_seconds} {self.minimum_interval}")
 
-        print(f"checking {self.pin}")
+
+        #print(f"checking {self.pin}")
         if self.mock:
             sense_val = randint(0, self.mock_period)
         else:
@@ -181,7 +221,7 @@ class TouchPlay(object):
 
             if self.relay_output_pin and not self.relay_active:
                 event_loop.create_task(self.trigger_relay())
-            if self.led_enabled and not self.led_active:
+            if self.led_enabled and not self.led_active and not self.led_strip.is_active:
                 event_loop.create_task(self.trigger_led())
 
         self.process_audio_signal(sense_val)
@@ -243,3 +283,5 @@ class TouchPlay(object):
                     self.kill_sound()
                     print(f"{self.pin} killed at {self.pos}")
                     self.lastTime = now
+
+
