@@ -141,7 +141,8 @@ class TouchPlay(object):
         if len(self.fileList) == 1:
             return self.fileList[0]
         choice = random.choice(list(self.fileDict.keys()))
-        print("Picking " + choice)
+        if self.verbosity:
+            print("Picking " + choice)
         return choice
 
     def append_pos(self, delta):
@@ -326,7 +327,7 @@ class TouchPlay(object):
         # process input
         if sense_val == 0:
             # input is active
-            print("on")
+            #print("on")
             if not self.playing:
                 self.start_sound(start_time=now)
                 # if self.pos <= 0 or self.pos >= self.length:

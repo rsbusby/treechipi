@@ -164,7 +164,7 @@ led_update_interval = 0.01
 async def touch_check(event_loop, touch_sensor_list):
     while True:
         await asyncio.sleep(touch_check_interval)
-        print("Checking touch pins")
+
         for s in touch_sensor_list:
             s.check_new(event_loop)
 
