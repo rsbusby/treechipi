@@ -1,13 +1,13 @@
 
 
-#####set up Raspberry Pi volume
+##### Set Raspberry Pi volume 
 
 >alsaconfig
 
 Adjust the volume sliders with the arrow keys  
 
 
-#####GPIO pin numbers:  
+##### GPIO pin numbers:  
 see `led_touch_event_loop.py` for the latest 
 
 ```
@@ -37,11 +37,11 @@ p6: 15
 ```
 relay pins are set in the configuration
 
-##### run program
+##### Run program
 `sudo PYTHONPATH="$PYTHONPATH:/home/pi/rpi_ws281x/python/build/lib.linux-armv7l-3.7:/home/pi/rpi_ws281x/python" python3 scripts/led_touch_event_loop.py`
  
  
-#####run automatically after boot of Raspberry Pi
+##### Run automatically after boot of Raspberry Pi
 Add the following to /etc/rc.local
 
 >sudo nano /etc/rc.local
