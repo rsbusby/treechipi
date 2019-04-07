@@ -17,6 +17,7 @@ if __name__ == '__main__':
     prox_config_list = []
 
     mock_val = False
+    verbosity = 0
 
     tc = Box()
 
@@ -26,7 +27,7 @@ if __name__ == '__main__':
         index = pin_index + 1
 
         tc = deepcopy(tc)
-
+        tc.verbosity = verbosity
         tc.vol = -2000
         tc.pin = touch_input_pins[pin_index]
         tc.dir = f't{index}'

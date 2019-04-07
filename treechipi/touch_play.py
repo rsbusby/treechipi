@@ -41,6 +41,8 @@ def create_from_box(b):
 
     touch_play.led_enabled = b.led_enabled
 
+    touch_play.verbosity = b.get('verbosity', 0)
+
     br = None
     bcs = b.get('base_color_string', None)
     if bcs:
