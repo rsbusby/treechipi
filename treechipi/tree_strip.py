@@ -5,6 +5,7 @@ import time
 from neopixel import *
 
 import numpy as np
+from copy import deepcopy
 
 update_period = 0.0004
 
@@ -55,13 +56,13 @@ class TreeStrip(Adafruit_NeoPixel):
         self.target_base_color = self.base_color
         self.base_target_approach_rate = 0.1
 
-        self.old_pixel_stack = deque()
         self.explode_thresh = int(0.75 * self.num_pix)
         self.explode_color = name_to_color('aqua')
         self.next_explode_color = Color(0 ,0 ,5)
         self.exploding = False
 
         self.is_active = False
+        self.updating = False
 
     @staticmethod
     def rgb_components(color):
@@ -182,39 +183,6 @@ class TreeStrip(Adafruit_NeoPixel):
             self.set_pixel_color(si, self.active_color)
         self.show()
 
-    def dim_pixel(self, pixel):
-        #pixel_color = Color(22, 0, 0)
-        pixel_color =self.base_color
-        self.set_pixel_color(pixel, pixel_color)
-
-    def dim_old_pixels(self):
-        if len(self.old_pixel_stack) > 8:
-            pixel = self.old_pixel_stack.pop()
-
-        # self.setPixelColor(pixel, self.base_color)
-        # pixel_color = Color(22, 0, 0)
-        for pixel in self.old_pixel_stack:
-            if pixel != self.active_pixel:
-                # print("changing {} pixel to dim".format(pixel))
-                # self.setPixelColor(pixel, pixel_color)
-                self.dim_pixel(pixel)
-
-    async def explode(self):
-        while True:
-            await asyncio.sleep(0.0005)
-
-            if self.exploding:
-                temp_color = self.explode_color
-                self.explode_color = self.next_explode_color
-                self.next_explode_color = temp_color
-                for i in range(self.explode_thresh, self.num_pix):
-                    self.set_pixel_color(i, self.explode_color)
-                self.show()
-
-    def explode_pixels(self, color):
-        for i in range(self.explode_thresh, self.num_pix):
-            self.set_pixel_color(i, color)
-
     def update_base(self):
         self.update_base_color()
         #self.all_to_base(skip_active=True, show=False)
@@ -234,43 +202,6 @@ class TreeStrip(Adafruit_NeoPixel):
         else:
             return False
 
-    def update_old(self):
-
-        if self.active_pixel != self.target_pixel:
-            #print(f"traget {self.target_pixel}   {self.active_pixel}")
-            # move one
-            self.previous_index =self.active_pixel
-            self.old_pixel_stack.appendleft(self.active_pixel)
-
-            pdiff = self.target_pixel - self.active_pixel
-
-            if pdiff > 0:
-                self.active_pixel = self.active_pixel + 1
-            else:
-                self.active_pixel = self.active_pixel - 1
-
-            # print("target {} ,   active {} ".format(self.target_pixel, self.active_pixel))
-            # print(self.old_pixel_stack)
-
-        # if self.active_pixel > self.explode_thresh:
-        #     if not self.exploding:
-        #         print("explode!")
-        #         # self.explode(color=self.explode_color)
-        #         self.exploding = True
-        # else:
-        #     if self.exploding:
-        #         # self.explode(self.base_color)
-        #         self.exploding = False
-        #         self.explode_pixels(Color(0, 0, 0))
-        #     self.set_pixel_color(self.active_pixel, self.active_color)
-
-        # self.dim_old_pixels()
-        self.dim_pixel(self.previous_index)
-
-        self.update_base()
-
-        self.show()
-
     def update(self):
 
         """
@@ -280,18 +211,11 @@ class TreeStrip(Adafruit_NeoPixel):
 
 
         """
-
-
-        #print("update new!")
         needs_update = self.update_base_color()
-
-        #self.all_to_base()
 
         if self.active_pixel != self.target_pixel:
             # print(f"traget {self.target_pixel}   {self.active_pixel}")
             # move one
-            self.previous_index = self.active_pixel
-            self.old_pixel_stack.appendleft(self.active_pixel)
 
             pdiff = self.target_pixel - self.active_pixel
 
@@ -302,17 +226,19 @@ class TreeStrip(Adafruit_NeoPixel):
             needs_update = True
 
         if needs_update:
+            # set this to avoid it changing in the loop!
+            active_temp = deepcopy(self.active_pixel)
+            base_temp = deepcopy(self.base_color)
             base_rgb = TreeStrip.rgb_components(self.base_color)
+            pulse_width = self.pulse_width
             for i in range(self.num_pix):
-
-                pulse_width = self.pulse_width
-                active_diff = np.abs(i - self.active_pixel)
+                active_diff = np.abs(i - active_temp)
                 if active_diff < pulse_width:
                     boost = pulse_width - active_diff
                     rgb_color = TreeStrip.boost_brightness(base_rgb, boost, self.boost_factor)
                     color = TreeStrip.rgb_to_color(rgb_color)
                 else:
-                    color = self.base_color
+                    color = base_temp
 
                 self.set_pixel_color(pixel=i, color=color)
 
