@@ -4,9 +4,7 @@ import json
 from copy import deepcopy
 
 # # Set up input GPIO pins
-touch_input_pins = [23, 12, 20, 27, 2, 14]
-prox_input_pins = [24, 16, 21, 22, 3, 15]
-relay_output_pins = [5, 6, 13, 19, 10, 9]
+from treechipi.constants import touch_input_pins, prox_input_pins, relay_output_pins
 
 shared_base_color_rgb = (4, 0, 32)
 shared_base_color_string = None
@@ -36,12 +34,12 @@ if __name__ == '__main__':
         tc.sustain = False
         tc.minimum_interval = 2
         tc.relay_output_pin = None
-        tc.relay_output_duration = 5
+        tc.relay_output_duration = 4
         tc.led_enabled = False
         tc.base_color_rgb = shared_base_color_rgb
         tc.active_color_rgb = (0, 0, 77)
         tc.mock = mock_val
-        tc.mock_period = 20
+        tc.mock_period = 8
         touch_config_list.append(tc)
 
     t1 = touch_config_list[0]
@@ -168,7 +166,7 @@ if __name__ == '__main__':
 
     json_string = json.dumps([b.to_dict() for b in touch_config_list], indent=True)
 
-    with open('/home/pi/treechipi/treechipi/config_05.json', 'w') as myfile:
+    with open('/home/pi/treechipi/treechipi/config_07.json', 'w') as myfile:
         myfile.write(json_string)
 
 

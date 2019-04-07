@@ -27,9 +27,7 @@ GPIO.setmode(GPIO.BCM)
 GPIO.setwarnings(False)  # Disable Warnings
 
 # Set up input GPIO pins
-touch_input_pins = [23, 12, 20, 27, 2, 14]
-prox_input_pins = [24, 16, 21, 22, 3, 15]
-relay_output_pins = [5, 6, 13, 19, 10, 9]
+from treechipi.constants import touch_input_pins, prox_input_pins, relay_output_pins
 
 # Set up relay output GPIO pins and set them to off
 #relay_output_pins = [22, 23, 24]
@@ -82,7 +80,7 @@ async def ongoing_update(strip):
 if __name__ == '__main__':
 
     # get configuration, read file
-    with open('/home/pi/treechipi/treechipi/config_05.json', 'r') as myfile:
+    with open('/home/pi/treechipi/treechipi/config_07.json', 'r') as myfile:
         data = myfile.read()
 
     # parse file

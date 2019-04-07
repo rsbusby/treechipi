@@ -80,7 +80,7 @@ class TouchPlay(object):
 
     def __init__(self, pin, fileList, duration = None, timeout=20, sustain=False, vol=0):
 
-        self.verbosity = 1
+        self.verbosity = 0
         self.fileList = fileList
         self.pin = pin
         self.timeout = timeout
