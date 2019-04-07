@@ -26,11 +26,10 @@ debug = True
 GPIO.setmode(GPIO.BCM)
 GPIO.setwarnings(False)  # Disable Warnings
 
-# Set up  GPIO pins
-touch_input_pins = [23, 12, 20, 27, 7, 14]
-prox_input_pins = [24, 16, 21, 22, 8, 15]
+# Set up input GPIO pins
+touch_input_pins = [23, 12, 20, 27, 2, 14]
+prox_input_pins = [24, 16, 21, 22, 3, 15]
 relay_output_pins = [5, 6, 13, 19, 10, 9]
-
 
 # Set up relay output GPIO pins and set them to off
 #relay_output_pins = [22, 23, 24]
