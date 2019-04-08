@@ -29,11 +29,11 @@ p3: 22
 t4: 20
 p4: 21
 
-t5: 2
-p5: 3
+t5: 14
+p5: 15
 
-t6: 14
-p6: 15
+t6: 2
+p6: 3
 ```
 relay pins are set in the configuration
 
