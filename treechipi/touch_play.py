@@ -102,7 +102,7 @@ class TouchPlay(object):
 
         self.fileDict = {}
         for f in self.fileList:
-            length = self.get_length_old(f)
+            length = self.get_length(f)
             self.fileDict[f] = length
 
         self.wavFile = self.get_file()
