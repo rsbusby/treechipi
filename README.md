@@ -2,7 +2,7 @@
 
 ##### Set Raspberry Pi volume 
 
->alsaconfig
+>alsamixer
 
 Adjust the volume sliders with the arrow keys  
 
@@ -11,7 +11,7 @@ Adjust the volume sliders with the arrow keys
 see `led_touch_event_loop.py` for the latest 
 
 ```
-touch_input_pins = [23, 12, 20, 27, 2, 14]
+touch_input_pins = [23, 26, 20, 27, 2, 14]
 prox_input_pins = [24, 16, 21, 22, 3, 15]
 relay_output_pins = [5, 6, 13, 19, 10, 9]
 ```
@@ -20,7 +20,7 @@ or, by touch and proximity:
 t1: 23
 p1: 24
 
-t2: 12
+t2: 26
 p2: 16
 
 t3: 20
