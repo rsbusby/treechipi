@@ -294,7 +294,7 @@ class TouchPlay(object):
         if self.wavFile:
             if self.pos <= 0 and not self.sustain:
                 #cmd = f'omxplayer --vol -1000 -o alsa:hw:1,0 {self.wavFile} &'
-                cmd = f'aplay -D sysdefault:CARD=1 {self.wavFile} &'
+                cmd = f'aplay -D sysdefault:CARD=1 {self.wavFile} > /dev/null 2>&1 &'
 
                 os.system(cmd)
 
@@ -307,7 +307,7 @@ class TouchPlay(object):
                     posOpt = f" --pos {self.pos}"
                 outStr = " > /dev/null 2>&1 "
                 #cmd_omx = "omxplayer --no-osd " + self.wavFile + " " + posOpt + self.volOpt + outStr + " &"
-                cmd_aplay = f'aplay -D sysdefault:CARD=1 {self.wavFile} &'
+                cmd_aplay = f'aplay -D sysdefault:CARD=1 {self.wavFile} > /dev/null 2>&1 &'
                 os.system(cmd_aplay)
                 print(f"{self.pin} starting {self.wavFile} , for {self.length} seconds")  # + str(self.iter)
                 # adjust pos because omxplayer takes a while to start
