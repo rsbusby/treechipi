@@ -32,9 +32,10 @@ if __name__ == '__main__':
         tc.vol = -2000
         tc.pin = touch_input_pins[pin_index]
         tc.dir = f't{index}'
-        tc.timeout = 5
+        tc.name = tc.dir
+        tc.timeout = 10
         tc.sustain = False
-        tc.minimum_interval = 1
+        tc.minimum_interval = 2
         tc.relay_output_pin = None
         tc.relay_output_duration = 2
         tc.led_enabled = False
@@ -88,7 +89,8 @@ if __name__ == '__main__':
         tc.vol = -2000
         tc.pin = prox_input_pins[pin_index]
         tc.dir = f'p{index}'
-        tc.timeout = 12
+        tc.name = tc.dir
+        tc.timeout = 120
         tc.sustain = True
         tc.minimum_interval = 20
         tc.relay_output_pin = None
