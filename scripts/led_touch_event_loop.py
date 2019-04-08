@@ -71,8 +71,7 @@ async def touch_check(event_loop, touch_sensor_list):
 
 async def ongoing_update(strip):
     while True:
-        await asyncio.sleep(led_update_interval)
-        #print(f"Updating strip {strip.base_color}")
+        await asyncio.sleep(strip.update_interval)
         strip.update()
 
 
@@ -91,6 +90,7 @@ if __name__ == '__main__':
 
     strip = get_default_tree_strip(data_pin=18, num_pixels=200)
     strip.begin()
+    strip.update_interval = 0.04
     print("LED strip initialized...\n")
     strip.base_color = touchSensors[0].base_color
     strip.all_to_base(skip_active=False, show=True)

@@ -72,6 +72,8 @@ def create_from_box(b):
     touch_play.mock = b.get('mock', True)
     touch_play.mock_period = b.get('mock_period', 20)
 
+    touch_play.led_off_when_signal_off = not touch_play.mock
+
     print(f'Setting up input sensor for pin {b.pin}, directory {b.dir}')
     print(f'relay: {touch_play.relay_output_pin}')
     print(f'led: {touch_play.led_enabled}')
@@ -123,6 +125,7 @@ class TouchPlay(object):
         self.mock = False
         self.mock_period = 20
 
+        self.led_off_when_signal_off = not self.mock
         self.event_loop = None
 
     def get_length(self, soundFile):
@@ -205,9 +208,10 @@ class TouchPlay(object):
         """
         print(f'{self.pin} LED is active! color to {self.active_color}')
         self.led_strip.target_base_color = self.active_color
-        self.led_strip.target_pixel = self.led_strip.num_pix - 2
+        self.led_strip.target_pixel = self.led_strip.num_pix - randint(2, 20)
         self.led_active = True
         self.led_strip.is_active = True
+        self.led_strip.update_interval = 0.01
 
     def led_off(self):
         """
@@ -215,8 +219,9 @@ class TouchPlay(object):
         """
         self.led_active = False
         self.led_strip.target_base_color = self.base_color
-        self.led_strip.target_pixel = 2
+        self.led_strip.target_pixel = randint(0, 30)
         self.led_strip.is_active = False
+        self.led_strip.update_interval = 0.04
 
 
         print(f'{self.pin} LED is inactive, color to {self.base_color}')
@@ -264,9 +269,8 @@ class TouchPlay(object):
                 print(f" Checking {self.pin}  val {sense_val} ")
 
         # optionally turn off LED color when input is not active
-        # if self.led_off_when_signal_off
-        #     if sense_val and self.led_enabled and self.led_active:
-        #         self.led_off()
+        if sense_val and self.led_enabled and self.led_active and self.led_off_when_signal_off:
+            self.led_off()
 
         if not sense_val:
             # sensor is active

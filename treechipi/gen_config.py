@@ -33,7 +33,7 @@ if __name__ == '__main__':
         tc.dir = f't{index}'
         tc.timeout = 5
         tc.sustain = False
-        tc.minimum_interval = 2
+        tc.minimum_interval = 1
         tc.relay_output_pin = None
         tc.relay_output_duration = 4
         tc.led_enabled = False
