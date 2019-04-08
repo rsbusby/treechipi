@@ -39,6 +39,8 @@ def create_from_box(b):
     touch_play.relay_output_pin = b.relay_output_pin
     touch_play.relay_output_duration = b.relay_output_duration
 
+    touch_play.name = b.get('name', 'noname')
+
     touch_play.led_enabled = b.led_enabled
 
     touch_play.verbosity = b.get('verbosity', 0)
@@ -84,7 +86,7 @@ def create_from_box(b):
 
 class TouchPlay(object):
 
-    def __init__(self, pin, fileList, duration = None, timeout=20, sustain=False, vol=0):
+    def __init__(self, pin, fileList, duration = None, timeout=20, sustain=False, vol=0, name='unnamed'):
 
         self.verbosity = 0
         self.fileList = fileList
@@ -97,9 +99,12 @@ class TouchPlay(object):
             self.volOpt = f" --vol {self.vol}"
         else:
             self.volOpt = ''
+
         self.fileDict = {}
         for f in self.fileList:
-            self.fileDict[f] = self.get_length(f)
+            length = self.get_length_old(f)
+            self.fileDict[f] = length
+
         self.wavFile = self.get_file()
         print(self.wavFile)
 
@@ -133,12 +138,29 @@ class TouchPlay(object):
         self.led_off_when_signal_off = not self.mock
         self.event_loop = None
 
-    def get_length(self, soundFile):
+    def get_length_pydub(self, soundFile):
         sound1 = AudioSegment.from_file(soundFile, format="wav")
         length = sound1.duration_seconds
+        print(f"Length of {soundFile} in seconds is {length:.2f}")
+        return length
+
+    def get_length(self, soundFile):
+        cmd = f'omxplayer {soundFile} --info > temp_length.txt'
+        info = subprocess.run(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT).stdout.decode('utf-8')
+        #print(info)
+        suffix = info.split("Duration:")[-1]
+        precomma = ''.join(suffix).split(',')[0]
+        tt = ''.join(precomma).split(":")
+        sec = float(tt[-1].lstrip('0'))
+        minute_string = tt[-2].lstrip('0')
+        if minute_string:
+            minute_val = int(minute_string)
+        else:
+            minute_val = 0
+        length = sec + minute_val * 60  # + tt[-3]*3600
         print(f"Length of {soundFile} in seconds is {length:.1f}")
         return length
-    
+
     def set_length(self):
         if self.wavFile:
             self.length = self.fileDict[self.wavFile]
