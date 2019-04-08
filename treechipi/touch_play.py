@@ -232,14 +232,14 @@ class TouchPlay(object):
         """
         self.relay_active = True
         GPIO.output(self.relay_output_pin, True)
-        if self.verbosity:
+        if self.verbosity > 1:
             print(f'{self.pin} starting relay on output pin {self.relay_output_pin}')
 
         await asyncio.sleep(self.relay_output_duration)
 
         GPIO.output(self.relay_output_pin, False)
         self.relay_active = False
-        if self.verbosity:
+        if self.verbosity > 1:
             print(f'{self.pin} stopping relay on output pin {self.relay_output_pin}')
 
     def check_new(self, event_loop):
@@ -251,7 +251,7 @@ class TouchPlay(object):
             interval_seconds = interval.seconds
 
             if not (interval_seconds > self.minimum_interval):
-                if self.verbosity:
+                if self.verbosity > 3:
                     print(f"{self.pin} pin waiting {self.minimum_interval - interval_seconds}")
                 return
             else:
@@ -265,7 +265,7 @@ class TouchPlay(object):
             #sense_val = 1
             pass
             sense_val = GPIO.input(self.pin)
-            if self.verbosity:
+            if self.verbosity > 3:
                 print(f" Checking {self.pin}  val {sense_val} ")
 
         # optionally turn off LED color when input is not active
@@ -274,7 +274,7 @@ class TouchPlay(object):
 
         if not sense_val:
             # sensor is active
-            if self.verbosity:
+            if self.verbosity > 0:
                 print(f'{self.pin} is active')
 
             if self.relay_output_pin and not self.relay_active:
@@ -298,7 +298,7 @@ class TouchPlay(object):
 
                 os.system(cmd)
 
-                if self.verbosity:
+                if self.verbosity > 1:
                     print(cmd)
                     print(f"{self.pin} starting sound {self.wavFile}")  # + str(self.iter))
             else:
