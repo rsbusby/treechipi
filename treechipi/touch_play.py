@@ -78,7 +78,7 @@ def create_from_box(b):
 
     touch_play.led_off_when_signal_off = not touch_play.mock
 
-    print(f'Setting up input sensor for pin {b.pin}, directory {b.dir}')
+    print(f'Setting up input sensor for pin {b.pin}, directory {b.dir}, name {touch_play.name}')
     print(f'relay: {touch_play.relay_output_pin}')
     print(f'led: {touch_play.led_enabled}')
     return touch_play
@@ -89,6 +89,7 @@ class TouchPlay(object):
     def __init__(self, pin, fileList, duration = None, timeout=20, sustain=False, vol=0, name='unnamed'):
 
         self.verbosity = 0
+        self.name = name
         self.fileList = fileList
         self.pin = pin
         self.timeout = timeout
@@ -117,6 +118,7 @@ class TouchPlay(object):
         self.startTime = None
         self.lastTime = datetime.now()
         self.length = None
+        self.is_active = False
 
         # relay output
         self.relay_enabled = True
@@ -233,7 +235,8 @@ class TouchPlay(object):
         """
         Trigger LED strip on
         """
-        print(f'{self.pin} LED is active! color to {self.active_color}')
+        if self.verbosity:
+            print(f'{self.pin} LED is active! color to {self.active_color}')
         self.led_strip.target_base_color = self.active_color
         self.led_strip.target_pixel = self.led_strip.num_pix - randint(2, 20)
         self.led_active = True
@@ -250,8 +253,8 @@ class TouchPlay(object):
         self.led_strip.is_active = False
         self.led_strip.update_interval = 0.04
 
-
-        print(f'{self.pin} LED is inactive, color to {self.base_color}')
+        if self.verbosity:
+            print(f'{self.pin} LED is inactive, color to {self.base_color}')
 
     async def trigger_relay(self):
         """
@@ -278,28 +281,26 @@ class TouchPlay(object):
             interval_seconds = interval.seconds
 
             if not (interval_seconds > self.minimum_interval):
-                if self.verbosity > 3:
+                if self.verbosity > 2:
                     print(f"{self.pin} pin waiting {self.minimum_interval - interval_seconds}")
                 return
             else:
-                if self.verbosity:
-                    #print(f"{self.pin} processing, {interval_seconds} {self.minimum_interval}")
+                if self.verbosity > 3:
+                    print(f"{self.pin} processing, {interval_seconds} {self.minimum_interval}")
                     pass
 
         if self.mock:
             sense_val = randint(0, self.mock_period)
         else:
-            #sense_val = 1
-            pass
             sense_val = GPIO.input(self.pin)
             if self.verbosity > 3:
-                print(f" Checking {self.pin}  val {sense_val} ")
+                print(f" Reading {self.pin} {self.name}  val: {sense_val} ")
 
         # optionally turn off LED color when input is not active
         if sense_val and self.led_enabled and self.led_active and self.led_off_when_signal_off:
             self.led_off()
 
-        if not sense_val:
+        if not sense_val and not self.is_active:
             # sensor is active
             if self.verbosity > 0:
                 print(f'{self.pin} is active')
@@ -312,6 +313,13 @@ class TouchPlay(object):
                 event_loop.create_task(self.trigger_led())
 
         self.process_audio_signal(sense_val)
+
+        if sense_val:
+            # avoid repetition
+            self.is_active = False
+        else:
+            self.is_active = True
+
 
     def start_sound(self, start_time):
 
@@ -336,7 +344,8 @@ class TouchPlay(object):
                 #cmd_omx = "omxplayer --no-osd " + self.wavFile + " " + posOpt + self.volOpt + outStr + " &"
                 cmd_aplay = f'aplay -D sysdefault:CARD=1 {self.wavFile} {self.out_string}'
                 os.system(cmd_aplay)
-                print(f"{self.pin} starting {self.wavFile} , for {self.length} seconds")  # + str(self.iter)
+                if self.verbosity > 2:
+                    print(f"{self.pin} starting {self.wavFile} , for {self.length} seconds")  # + str(self.iter)
                 # adjust pos because omxplayer takes a while to start
                 self.pos = self.pos - 1.5
             # now = datetime.now()
@@ -361,29 +370,10 @@ class TouchPlay(object):
         # process input
         if sense_val == 0:
             # input is active
-            #print("on")
+
             if not self.playing:
-                self.start_sound(start_time=now)
-                # if self.pos <= 0 or self.pos >= self.length:
-                #     self.wavFile = self.get_file()
-                #     self.set_length()
-                # if self.wavFile:
-                #     if self.pos <= 0 and not self.sustain:
-                #         os.system("omxplayer " + self.wavFile + " &")
-                #         print(f"{self.pin} starting aplay {self.wavFile}")  # + str(self.iter))
-                #     else:
-                #         posOpt = ''
-                #         if self.pos:
-                #             posOpt = f" --pos {self.pos}"
-                #         outStr = " > /dev/null 2>&1 "
-                #         os.system("omxplayer --no-osd " + self.wavFile + " " + posOpt + self.volOpt + outStr + " &")
-                #         print(f"{self.pin} starting {self.wavFile} with omx, for {self.length} seconds")  # + str(self.iter)
-                #         # adjust pos because omxplayer takes a while to start
-                #         self.pos = self.pos - 1.5
-                #     # now = datetime.now()
-                #     self.lastTime = now
-                #     self.playing = True
-                #     self.startTime = now
+                if not self.is_active:
+                    self.start_sound(start_time=now)
 
             else:  # self.playing == True
                 # already playing, keep going
@@ -391,7 +381,7 @@ class TouchPlay(object):
                 if self.sustain:
                     self.lastTime = now
 
-                if self.verbosity:
+                if self.verbosity > 1:
                     print(f"{self.pin} {self.wavFile} still playing")
 
         else:  # senseVal == 1:

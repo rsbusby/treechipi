@@ -195,14 +195,16 @@ class TreeStrip(Adafruit_NeoPixel):
 
     def update_base_color(self):
         if self.target_base_color != self.base_color:
-            print("Base color changed!")
+            if self.verbosity:
+                print("Base color changed!")
             if self.fade_base:
                 rgb_tuple = TreeStrip.fade_into_color_from_24bit(self.base_color,
                                                                  self.target_base_color,
                                                                  fade_rate=self.base_target_approach_rate)
                 self.base_color = Color(int(rgb_tuple[0]), int(rgb_tuple[1]), int(rgb_tuple[2]))
             else:
-                print(f'changin to {self.target_base_color} from {self.base_color}')
+                if self.verbosity:
+                    print(f'changin to {self.target_base_color} from {self.base_color}')
                 self.base_color = self.target_base_color
             return True
         else:

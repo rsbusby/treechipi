@@ -18,7 +18,7 @@ if __name__ == '__main__':
     prox_config_list = []
 
     mock_val = False
-    verbosity = 1
+    verbosity = 0
 
     tc = Box()
 
@@ -35,9 +35,9 @@ if __name__ == '__main__':
         tc.name = tc.dir
         tc.timeout = 10
         tc.sustain = False
-        tc.minimum_interval = 2
+        tc.minimum_interval = 1
         tc.relay_output_pin = None
-        tc.relay_output_duration = 2
+        tc.relay_output_duration = 3
         tc.led_enabled = False
         tc.base_color_rgb = shared_base_color_rgb
         tc.active_color_rgb = (0, 0, 77)
@@ -52,6 +52,10 @@ if __name__ == '__main__':
     try:
         t2 = touch_config_list[1]
         t2.led_enabled = True
+
+        t2.minimum_interval = 1
+        t2.mock_period = 0
+
         t2.active_color_string = None
         t2.active_color_rgb = (40, 1, 40)
         t2.relay_output_pin = None
@@ -99,7 +103,7 @@ if __name__ == '__main__':
         tc.base_color = shared_base_color_rgb
         tc.active_color_rgb = (0, 0, 77)
         tc.mock = mock_val
-        tc.mock_period = 14
+        tc.mock_period = 1400
         prox_config_list.append(tc)
 
     try:
