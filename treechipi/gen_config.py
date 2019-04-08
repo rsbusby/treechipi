@@ -9,6 +9,7 @@ from treechipi.constants import touch_input_pins, prox_input_pins, relay_output_
 shared_base_color_rgb = (4, 0, 32)
 shared_base_color_string = None
 
+proximity_enabled = True
 
 # Main program logic follows:
 if __name__ == '__main__':
@@ -163,7 +164,8 @@ if __name__ == '__main__':
     #
     # touch_config_list.append(t4b)
 
-    touch_config_list += prox_config_list
+    if proximity_enabled:
+        touch_config_list += prox_config_list
 
     json_string = json.dumps([b.to_dict() for b in touch_config_list], indent=True)
 
