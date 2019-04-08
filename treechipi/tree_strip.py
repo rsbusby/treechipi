@@ -45,7 +45,7 @@ class TreeStrip(Adafruit_NeoPixel):
         self.active_color = orange
         self.num_pix = self.numPixels()
 
-        self.pulse_width = 10
+        self.pulse_width = 16
         self.boost_factor = int(50.0 / self.pulse_width)
 
         self.previous_index = 0
@@ -67,6 +67,8 @@ class TreeStrip(Adafruit_NeoPixel):
         self.is_active = False
         self.updating = False
         self.update_interval = 0.01
+
+        self.pixel_change = 1
 
     @staticmethod
     def rgb_components(color):
@@ -217,16 +219,21 @@ class TreeStrip(Adafruit_NeoPixel):
         """
         needs_update = self.update_base_color()
 
-        pixel_change = 1
 
-        if self.active_pixel != self.target_pixel:
+        pdiff = self.target_pixel - self.active_pixel
+        abs_pdiff = abs(pdiff)
+        if abs_pdiff > 1:
             # move pixel
-            pdiff = self.target_pixel - self.active_pixel
+            if abs_pdiff < 10:
+                self.pixel_change = max(0.5, abs_pdiff * abs_pdiff / 100.0)
+            else:
+                self.pixel_change = min(1.0, self.pixel_change + 0.1)
+
 
             if pdiff > 0:
-                self.active_pixel = self.active_pixel + pixel_change
+                self.active_pixel = self.active_pixel + self.pixel_change
             else:
-                self.active_pixel = self.active_pixel - pixel_change
+                self.active_pixel = self.active_pixel - self.pixel_change
             needs_update = True
 
         else:
@@ -254,6 +261,6 @@ class TreeStrip(Adafruit_NeoPixel):
                 self.set_pixel_color(pixel=i, color=color)
 
             if self.verbosity:
-                print(f"done update, {self.active_pixel}")
+                print(f"done update, {self.target_pixel}  {self.active_pixel:0.1f} {self.pixel_change:0.1f}")
 
             self.show()
