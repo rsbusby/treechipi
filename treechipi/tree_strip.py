@@ -61,8 +61,9 @@ class TreeStrip(Adafruit_NeoPixel):
         self.next_explode_color = Color(0 ,0 ,5)
         self.exploding = False
 
+        self.random_signal_when_inactive = True
+        self.random_signal_when_active = True
 
-        self.random_signal = True
         self.is_active = False
         self.updating = False
         self.update_interval = 0.01
@@ -219,9 +220,7 @@ class TreeStrip(Adafruit_NeoPixel):
         pixel_change = 1
 
         if self.active_pixel != self.target_pixel:
-            # print(f"traget {self.target_pixel}   {self.active_pixel}")
-            # move one
-
+            # move pixel
             pdiff = self.target_pixel - self.active_pixel
 
             if pdiff > 0:
@@ -231,14 +230,10 @@ class TreeStrip(Adafruit_NeoPixel):
             needs_update = True
 
         else:
-            if self.random_signal:
-                if not self.is_active:
-                    # pick a random active pixel
-                    old_target = self.target_pixel
-                    self.target_pixel = random.randint(int(0), int(self.num_pix) / 5 * 2)
-                    print(f'changed target .... {old_target} ... {self.target_pixel}')
-                else:
-                    self.target_pixel = random.randint(int(self.num_pix / 5 * 3), int(self.num_pix))
+            if not self.is_active and self.random_signal_when_inactive:
+                self.target_pixel = random.randint(0, 30)
+            elif self.is_active and self.random_signal_when_active:
+                self.target_pixel = random.randint(int(self.num_pix / 5 * 3), int(self.num_pix))
 
 
         if needs_update:

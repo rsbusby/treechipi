@@ -219,7 +219,7 @@ class TouchPlay(object):
         """
         self.led_active = False
         self.led_strip.target_base_color = self.base_color
-        self.led_strip.target_pixel = randint(0, 30)
+        self.led_strip.target_pixel = randint(0, 10)
         self.led_strip.is_active = False
         self.led_strip.update_interval = 0.04
 

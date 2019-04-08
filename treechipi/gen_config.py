@@ -35,12 +35,12 @@ if __name__ == '__main__':
         tc.sustain = False
         tc.minimum_interval = 1
         tc.relay_output_pin = None
-        tc.relay_output_duration = 4
+        tc.relay_output_duration = 2
         tc.led_enabled = False
         tc.base_color_rgb = shared_base_color_rgb
         tc.active_color_rgb = (0, 0, 77)
         tc.mock = mock_val
-        tc.mock_period = 8
+        tc.mock_period = 120
         touch_config_list.append(tc)
 
     t1 = touch_config_list[0]
