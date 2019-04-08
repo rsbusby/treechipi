@@ -24,7 +24,7 @@ if __name__ == '__main__':
 
     # touch
 
-    for pin_index in range(0, 5):
+    for pin_index in range(0, 6):
         index = pin_index + 1
 
         tc = deepcopy(tc)
@@ -79,7 +79,7 @@ if __name__ == '__main__':
         pass
 
     # proximity
-    for pin_index in range(0, 5):
+    for pin_index in range(0, 6):
 
         tc = deepcopy(tc)
 
