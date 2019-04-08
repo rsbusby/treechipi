@@ -42,6 +42,8 @@ def create_from_box(b):
     touch_play.led_enabled = b.led_enabled
 
     touch_play.verbosity = b.get('verbosity', 0)
+    if touch_play.verbosity > 1:
+        touch_play.out_string = " &"
 
     br = None
     bcs = b.get('base_color_string', None)
@@ -100,6 +102,9 @@ class TouchPlay(object):
             self.fileDict[f] = self.get_length(f)
         self.wavFile = self.get_file()
         print(self.wavFile)
+
+        self.out_string = "> /dev/null 2>&1 &"
+
         self.set_length()
         self.iter = 0
         self.pos = 0        
@@ -294,7 +299,7 @@ class TouchPlay(object):
         if self.wavFile:
             if self.pos <= 0 and not self.sustain:
                 #cmd = f'omxplayer --vol -1000 -o alsa:hw:1,0 {self.wavFile} &'
-                cmd = f'aplay -D sysdefault:CARD=1 {self.wavFile} > /dev/null 2>&1 &'
+                cmd = f'aplay -D sysdefault:CARD=1 {self.wavFile} {self.out_string}'
 
                 os.system(cmd)
 
@@ -307,7 +312,7 @@ class TouchPlay(object):
                     posOpt = f" --pos {self.pos}"
                 outStr = " > /dev/null 2>&1 "
                 #cmd_omx = "omxplayer --no-osd " + self.wavFile + " " + posOpt + self.volOpt + outStr + " &"
-                cmd_aplay = f'aplay -D sysdefault:CARD=1 {self.wavFile} > /dev/null 2>&1 &'
+                cmd_aplay = f'aplay -D sysdefault:CARD=1 {self.wavFile} {self.out_string}'
                 os.system(cmd_aplay)
                 print(f"{self.pin} starting {self.wavFile} , for {self.length} seconds")  # + str(self.iter)
                 # adjust pos because omxplayer takes a while to start
