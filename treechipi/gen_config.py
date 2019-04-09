@@ -17,7 +17,7 @@ if __name__ == '__main__':
     touch_config_list = []
     prox_config_list = []
 
-    mock_val = True
+    mock_val = False
     verbosity = 1
 
     tc = Box()
