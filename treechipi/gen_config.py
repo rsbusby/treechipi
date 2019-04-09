@@ -35,7 +35,7 @@ if __name__ == '__main__':
         tc.name = tc.dir
         tc.timeout = 10
         tc.sustain = False
-        tc.minimum_interval = 1
+        tc.minimum_interval = 0
         tc.relay_output_pin = None
         tc.relay_output_duration = 3
         tc.led_enabled = False
@@ -53,11 +53,11 @@ if __name__ == '__main__':
         t6 = touch_config_list[5]
         t6.led_enabled = True
 
-        t6.minimum_interval = 1
+        t6.minimum_interval = 0
         t6.mock_period = 0
 
         t6.active_color_string = None
-        t6.active_color_rgb = (40, 1, 40)
+        t6.active_color_rgb = (0, 30, 40)
         t6.relay_output_pin = None
     except:
         pass
@@ -96,7 +96,7 @@ if __name__ == '__main__':
         tc.name = tc.dir
         tc.timeout = 120
         tc.sustain = True
-        tc.minimum_interval = 250
+        tc.minimum_interval = 289
         tc.relay_output_pin = None
         tc.relay_output_duration = 4
         tc.led_enabled = False
@@ -108,13 +108,34 @@ if __name__ == '__main__':
 
     try:
         p2 = prox_config_list[1]
+        p2.minimum_interval = 371
     except Exception as e:
         pass
 
     try:
         p3 = prox_config_list[2]
+        p3.minimum_interval = 411
     except Exception as e:
         pass
+
+    try:
+        p4 = prox_config_list[3]
+        p4.minimum_interval = 503
+    except Exception as e:
+        pass
+
+    try:
+        p5 = prox_config_list[4]
+        p5.minimum_interval = 703
+    except Exception as e:
+        pass
+
+    try:
+        p6 = prox_config_list[4]
+        p6.minimum_interval = 497
+    except Exception as e:
+        pass
+
 
     # touch_config_list.append(t1b)
     #
