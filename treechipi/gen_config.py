@@ -107,6 +107,12 @@ if __name__ == '__main__':
         prox_config_list.append(tc)
 
     try:
+        p1 = prox_config_list[0]
+        p1.minimum_interval = 67
+    except Exception as e:
+        pass
+
+    try:
         p2 = prox_config_list[1]
         p2.minimum_interval = 51
     except Exception as e:
