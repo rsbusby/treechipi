@@ -88,7 +88,7 @@ if __name__ == '__main__':
     touchSensors = [create_from_box(b) for b in config_box_list]
     print(len(touchSensors))
 
-    strip = get_default_tree_strip(data_pin=18, num_pixels=200)
+    strip = get_default_tree_strip(data_pin=18, num_pixels=300)
     strip.begin()
     strip.update_interval = 0.04
     print("LED strip initialized...\n")
