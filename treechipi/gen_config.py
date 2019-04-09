@@ -6,7 +6,7 @@ from copy import deepcopy
 # # Set up input GPIO pins
 from treechipi.constants import touch_input_pins, prox_input_pins, relay_output_pins
 
-shared_base_color_rgb = (4, 0, 32)
+shared_base_color_rgb = (25, 0, 32)
 shared_base_color_string = None
 
 proximity_enabled = True
@@ -17,7 +17,7 @@ if __name__ == '__main__':
     touch_config_list = []
     prox_config_list = []
 
-    mock_val = False
+    mock_val = True
     verbosity = 1
 
     tc = Box()
@@ -40,14 +40,14 @@ if __name__ == '__main__':
         tc.relay_output_duration = 3
         tc.led_enabled = False
         tc.base_color_rgb = shared_base_color_rgb
-        tc.active_color_rgb = (0, 0, 77)
+        tc.active_color_rgb = (38, 30, 0)
         tc.mock = mock_val
-        tc.mock_period = 120
+        tc.mock_period = 12
         touch_config_list.append(tc)
 
     t1 = touch_config_list[0]
     t1.led_enabled = True
-    t1.active_color_rgb =  (0, 0, 77)
+    t1.active_color_rgb =  (38, 30, 0)
 
     try:
         t2 = touch_config_list[1]
@@ -65,21 +65,21 @@ if __name__ == '__main__':
     try:
         t3 = touch_config_list[2]
         t3.led_enabled = False
-        t3.relay_output_pin = relay_output_pins[0]
+        t3.relay_output_pin = 5
     except:
         pass
 
     try:
         t4 = touch_config_list[3]
         t4.led_enabled = False
-        t4.relay_output_pin = relay_output_pins[1]
+        t4.relay_output_pin = 19
     except:
         pass
 
     try:
         t5 = touch_config_list[4]
         t5.led_enabled = False
-        t5.relay_output_pin = relay_output_pins[2]
+        t5.relay_output_pin = 6
     except:
         pass
 

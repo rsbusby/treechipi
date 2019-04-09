@@ -136,12 +136,7 @@ class TreeStrip(Adafruit_NeoPixel):
             i = pixel
         self.setPixelColor(i, color)
 
-    def set_pixel_color_rgb(self, pixel, color_rgb, reverse=False):
-        if reverse:
-            i = self.num_pix - pixel
-        else:
-            i = pixel
-        self.setPixelColorRGB(i, color_rgb[0], color_rgb[1], color_rgb[2])
+    # mpl
 
     # def update_base_color(self):
     #
@@ -194,9 +189,10 @@ class TreeStrip(Adafruit_NeoPixel):
         #self.all_to_base(skip_active=True, show=False)
 
     def update_base_color(self):
+
         if self.target_base_color != self.base_color:
-            if self.verbosity:
-                print("Base color changed!")
+            # if self.verbosity:
+            #     print("Base color changed!")
             if self.fade_base:
                 rgb_tuple = TreeStrip.fade_into_color_from_24bit(self.base_color,
                                                                  self.target_base_color,
@@ -226,11 +222,11 @@ class TreeStrip(Adafruit_NeoPixel):
         abs_pdiff = abs(pdiff)
         if abs_pdiff > 1:
             # move pixel
-            if abs_pdiff < 10:
-                self.pixel_change = max(0.5, abs_pdiff * abs_pdiff / 100.0)
-            else:
-                self.pixel_change = min(1.0, self.pixel_change + 0.1)
-
+            # if abs_pdiff < 10:
+            #     self.pixel_change = max(0.5, abs_pdiff * abs_pdiff / 100.0)
+            # else:
+            #     self.pixel_change = min(1.0, self.pixel_change + 0.1)
+            #
 
             if pdiff > 0:
                 self.active_pixel = self.active_pixel + self.pixel_change
@@ -262,7 +258,7 @@ class TreeStrip(Adafruit_NeoPixel):
 
                 self.set_pixel_color(pixel=i, color=color)
 
-            if self.verbosity:
+            if 1: #self.verbosity:
                 print(f"done update, {self.target_pixel}  {self.active_pixel:0.1f} {self.pixel_change:0.1f}")
 
             self.show()
