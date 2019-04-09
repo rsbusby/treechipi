@@ -52,7 +52,7 @@ class TreeStrip(Adafruit_NeoPixel):
         self.target_pixel = 0
         self.active_pixel = 0
 
-        self.fade_base = False
+        self.fade_base = True
         self.target_base_color = self.base_color
         self.base_target_approach_rate = 0.1
 
