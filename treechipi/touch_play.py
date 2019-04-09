@@ -13,6 +13,10 @@ from pydub.playback import play
 from datetime import datetime
 import random
 
+import collections
+import itertools
+
+
 from treechipi.tree_colors import *
 from treechipi.tree_strip import TreeStrip
 
@@ -27,14 +31,24 @@ def files_from_dir(d, wd=None):
     return [wd + '/' + d+'/'+ f for f in os.listdir(wd + '/' + d)]
 
 
+def files_from_dir_recursive(d, wd=None):
+    if not wd:
+        wd = sdir
+    base_dir = f'{wd}/{d}'
+    listOfFiles = list()
+    for (dirpath, dirnames, filenames) in os.walk(base_dir):
+        listOfFiles += [os.path.join(dirpath, file) for file in filenames]
+
+    return listOfFiles
+
+
 def create_from_box(b):
     """ Use python-box dict to set up an object
     :param
     :return:
     """
 
-
-    touch_play = TouchPlay(b.pin, files_from_dir(b.dir), timeout=b.timeout, sustain=b.sustain)
+    touch_play = TouchPlay(b.pin, files_from_dir_recursive(b.dir), timeout=b.timeout, sustain=b.sustain)
     touch_play.minimum_interval = b.minimum_interval
     touch_play.relay_output_pin = b.relay_output_pin
     touch_play.relay_output_duration = b.relay_output_duration
@@ -106,6 +120,8 @@ class TouchPlay(object):
             length = self.get_length(f)
             self.fileDict[f] = length
 
+        self.file_generator = itertools.cycle(self.fileList)
+
         self.wavFile = self.get_file()
         print(self.wavFile)
 
@@ -168,13 +184,16 @@ class TouchPlay(object):
             self.length = self.fileDict[self.wavFile]
             return True
         return False
-        
+
     def get_file(self):
         if not len(self.fileList):
             return None
         if len(self.fileList) == 1:
             return self.fileList[0]
-        choice = random.choice(list(self.fileDict.keys()))
+        #choice = random.choice(list(self.fileDict.keys()))
+
+        choice = next(self.file_generator)
+
         if self.verbosity:
             print("Picking " + choice)
         return choice
