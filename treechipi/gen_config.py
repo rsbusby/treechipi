@@ -90,7 +90,7 @@ if __name__ == '__main__':
 
         index = pin_index + 1
 
-        tc.vol = -4000
+        tc.vol = -2000
         tc.pin = prox_input_pins[pin_index]
         tc.dir = f'p{index}'
         tc.name = tc.dir
