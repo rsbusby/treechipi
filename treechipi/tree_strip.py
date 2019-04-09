@@ -258,7 +258,7 @@ class TreeStrip(Adafruit_NeoPixel):
 
                 self.set_pixel_color(pixel=i, color=color)
 
-            if 1: #self.verbosity:
+            if self.verbosity:
                 print(f"done update, {self.target_pixel}  {self.active_pixel:0.1f} {self.pixel_change:0.1f}")
 
             self.show()
