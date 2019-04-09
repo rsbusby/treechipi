@@ -50,15 +50,15 @@ if __name__ == '__main__':
     t1.active_color_rgb =  (38, 30, 0)
 
     try:
-        t2 = touch_config_list[1]
-        t2.led_enabled = True
+        t6 = touch_config_list[5]
+        t6.led_enabled = True
 
-        t2.minimum_interval = 1
-        t2.mock_period = 0
+        t6.minimum_interval = 1
+        t6.mock_period = 0
 
-        t2.active_color_string = None
-        t2.active_color_rgb = (40, 1, 40)
-        t2.relay_output_pin = None
+        t6.active_color_string = None
+        t6.active_color_rgb = (40, 1, 40)
+        t6.relay_output_pin = None
     except:
         pass
 
@@ -70,9 +70,9 @@ if __name__ == '__main__':
         pass
 
     try:
-        t4 = touch_config_list[3]
-        t4.led_enabled = False
-        t4.relay_output_pin = 19
+        t2 = touch_config_list[1]
+        t2.led_enabled = False
+        t2.relay_output_pin = 19
     except:
         pass
 
