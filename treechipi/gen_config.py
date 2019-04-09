@@ -96,7 +96,7 @@ if __name__ == '__main__':
         tc.name = tc.dir
         tc.timeout = 120
         tc.sustain = True
-        tc.minimum_interval = 20
+        tc.minimum_interval = 250
         tc.relay_output_pin = None
         tc.relay_output_duration = 4
         tc.led_enabled = False
