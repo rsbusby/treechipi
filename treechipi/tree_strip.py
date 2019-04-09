@@ -61,8 +61,8 @@ class TreeStrip(Adafruit_NeoPixel):
         self.next_explode_color = Color(0 ,0 ,5)
         self.exploding = False
 
-        self.random_signal_when_inactive = True
-        self.random_signal_when_active = True
+        self.random_signal_when_inactive = False
+        self.random_signal_when_active = False
 
         self.is_active = False
         self.updating = False
