@@ -108,13 +108,13 @@ if __name__ == '__main__':
 
     try:
         p2 = prox_config_list[1]
-        p2.minimum_interval = 371
+        p2.minimum_interval = 117
     except Exception as e:
         pass
 
     try:
         p3 = prox_config_list[2]
-        p3.minimum_interval = 271
+        p3.minimum_interval = 71
     except Exception as e:
         pass
 
@@ -126,13 +126,13 @@ if __name__ == '__main__':
 
     try:
         p5 = prox_config_list[4]
-        p5.minimum_interval = 423
+        p5.minimum_interval = 393
     except Exception as e:
         pass
 
     try:
         p6 = prox_config_list[4]
-        p6.minimum_interval = 387
+        p6.minimum_interval = 51
     except Exception as e:
         pass
 
