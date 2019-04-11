@@ -52,3 +52,4 @@ ripts/led_touch_event_loop.py > /dev/null 2>&1 &)
 ```
 
 
+https://docs.google.com/document/d/1NlS4hL0Mb0uoLkr-EI-Y4GzoPQCwdnx7UXxgSGZLiow/edit
