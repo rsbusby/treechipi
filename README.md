@@ -84,7 +84,7 @@ make install
 #### Install LED strip control library
 Will add this 
 	
-##Enable SSH 
+####Enable SSH 
 
 https://www.raspberrypi.org/documentation/remote-access/ssh/
 Launch Raspberry Pi Configuration from the Preferences menu
@@ -105,7 +105,7 @@ Get code from github, on Pi
 Open terminal on Pi
 git clone https://github.com/rsbusby/treechipi.git 
 Configure:
-cd treechip
+cd treechipi
 sudo sh config
 Run
 sudo sh run
