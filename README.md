@@ -69,7 +69,7 @@ wget https://www.python.org/ftp/python/3.7.0/Python-3.7.0.tar.xz
 
 tar xf Python-3.7.0.tar.xz
 
-cd cpython-3.7.0
+cd Python-3.7.0
 
 ./configure --prefix=$HOME/.local
  
