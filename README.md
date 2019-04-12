@@ -1,4 +1,11 @@
 
+cd 
+
+cd treechipi
+
+
+
+
 
 ##### Set Raspberry Pi volume 
 

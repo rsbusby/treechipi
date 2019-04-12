@@ -17,7 +17,7 @@ from box import Box
 
 #from neopixel import *
 from treechipi.touch_play import TouchPlay, create_from_box
-from treechipi.tree_strip import get_default_tree_strip, TreeStrip
+#from treechipi.tree_strip import get_default_tree_strip, TreeStrip
 
 debug = True
 
