@@ -7,9 +7,9 @@ import os
 from random import randint
 
 import subprocess
-import pydub
-from pydub import AudioSegment
-from pydub.playback import play
+#import pydub
+#from pydub import AudioSegment
+#from pydub.playback import play
 from datetime import datetime
 import random
 
@@ -142,12 +142,12 @@ class TouchPlay(object):
         self.relay_output_duration = 2
         self.relay_active = False
 
-        # LED output
-        self.led_enabled = False
-        self.led_strip = None
-        self.base_color = red
-        self.active_color = purple
-        self.led_active = False
+        # # LED output
+        # self.led_enabled = False
+        # self.led_strip = None
+        # self.base_color = redb
+        # self.active_color = purple
+        # self.led_active = False
 
         # testing
         self.mock = False
@@ -156,11 +156,11 @@ class TouchPlay(object):
         self.led_off_when_signal_off = not self.mock
         self.event_loop = None
 
-    def get_length_pydub(self, soundFile):
-        sound1 = AudioSegment.from_file(soundFile, format="wav")
-        length = sound1.duration_seconds
-        print(f"Length of {soundFile} in seconds is {length:.2f}")
-        return length
+    # def get_length_pydub(self, soundFile):
+    #     sound1 = AudioSegment.from_file(soundFile, format="wav")
+    #     length = sound1.duration_seconds
+    #     print(f"Length of {soundFile} in seconds is {length:.2f}")
+    #     return length
 
     def get_length(self, soundFile):
         cmd = f'omxplayer {soundFile} --info > temp_length.txt'
@@ -242,38 +242,38 @@ class TouchPlay(object):
     #     if stderr:
     #         print(f'[stderr]\n{stderr.decode()}')
 
-    async def trigger_led(self):
-        """
-        Trigger LED strip for a bit
-        """
-        self.led_on()
-        await asyncio.sleep(self.relay_output_duration)
-        self.led_off()
+    # async def trigger_led(self):
+    #     """
+    #     Trigger LED strip for a bit
+    #     """
+    #     self.led_on()
+    #     await asyncio.sleep(self.relay_output_duration)
+    #     self.led_off()
 
-    def led_on(self):
-        """
-        Trigger LED strip on
-        """
-        if self.verbosity:
-            print(f'{self.pin} LED is active! color to {self.active_color}')
-        self.led_strip.target_base_color = self.active_color
-        self.led_strip.target_pixel = self.led_strip.num_pix - randint(2, 20)
-        self.led_active = True
-        self.led_strip.is_active = True
-        self.led_strip.update_interval = 0.01
-
-    def led_off(self):
-        """
-        Trigger LED strip off
-        """
-        self.led_active = False
-        self.led_strip.target_base_color = self.base_color
-        self.led_strip.target_pixel = randint(0, 10)
-        self.led_strip.is_active = False
-        self.led_strip.update_interval = 0.04
-
-        if self.verbosity:
-            print(f'{self.pin} LED is inactive, color to {self.base_color}')
+    # def led_on(self):
+    #     """
+    #     Trigger LED strip on
+    #     """
+    #     if self.verbosity:
+    #         print(f'{self.pin} LED is active! color to {self.active_color}')
+    #     self.led_strip.target_base_color = self.active_color
+    #     self.led_strip.target_pixel = self.led_strip.num_pix - randint(2, 20)
+    #     self.led_active = True
+    #     self.led_strip.is_active = True
+    #     self.led_strip.update_interval = 0.01
+    #
+    # def led_off(self):
+    #     """
+    #     Trigger LED strip off
+    #     """
+    #     self.led_active = False
+    #     self.led_strip.target_base_color = self.base_color
+    #     self.led_strip.target_pixel = randint(0, 10)
+    #     self.led_strip.is_active = False
+    #     self.led_strip.update_interval = 0.04
+    #
+    #     if self.verbosity:
+    #         print(f'{self.pin} LED is inactive, color to {self.base_color}')
 
     async def trigger_relay(self):
         """
@@ -315,9 +315,9 @@ class TouchPlay(object):
             if self.verbosity > 3:
                 print(f" Reading {self.pin} {self.name}  val: {sense_val} ")
 
-        # optionally turn off LED color when input is not active
-        if sense_val and self.led_enabled and self.led_active and self.led_off_when_signal_off:
-            self.led_off()
+        # # optionally turn off LED color when input is not active
+        # if sense_val and self.led_enabled and self.led_active and self.led_off_when_signal_off:
+        #     self.led_off()
 
         if not sense_val and not self.is_active:
             # sensor is active
@@ -326,10 +326,10 @@ class TouchPlay(object):
 
             if self.relay_output_pin and not self.relay_active:
                 event_loop.create_task(self.trigger_relay())
-            if self.led_enabled and not self.led_active and not self.led_strip.is_active:
-                self.led_active = True
-                self.led_strip.is_active = True
-                event_loop.create_task(self.trigger_led())
+            # if self.led_enabled and not self.led_active and not self.led_strip.is_active:
+            #     self.led_active = True
+            #     self.led_strip.is_active = True
+            #     event_loop.create_task(self.trigger_led())
 
         self.process_audio_signal(sense_val)
 

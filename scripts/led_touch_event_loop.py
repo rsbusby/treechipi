@@ -15,7 +15,7 @@ from box import Box
 #sys.path.insert(0, "../fancy")
 
 
-from neopixel import *
+#from neopixel import *
 from treechipi.touch_play import TouchPlay, create_from_box
 from treechipi.tree_strip import get_default_tree_strip, TreeStrip
 
@@ -69,10 +69,10 @@ async def touch_check(event_loop, touch_sensor_list):
             s.check_new(event_loop)
 
 
-async def ongoing_update(strip):
-    while True:
-        await asyncio.sleep(strip.update_interval)
-        strip.update()
+# async def ongoing_update(strip):
+#     while True:
+#         await asyncio.sleep(strip.update_interval)
+#         strip.update()
 
 
 # Main program logic follows:
@@ -88,24 +88,24 @@ if __name__ == '__main__':
     touchSensors = [create_from_box(b) for b in config_box_list]
     print(len(touchSensors))
 
-    strip = get_default_tree_strip(data_pin=18, num_pixels=300)
-    strip.begin()
-    strip.update_interval = 0.04
-    print("LED strip initialized...\n")
-    strip.base_color = touchSensors[0].base_color
-    strip.all_to_base(skip_active=False, show=True)
-
-    for tp in touchSensors:
-        tp.led_strip = strip
+    # strip = get_default_tree_strip(data_pin=18, num_pixels=300)
+    # strip.begin()
+    # strip.update_interval = 0.04
+    # print("LED strip initialized...\n")
+    # strip.base_color = touchSensors[0].base_color
+    # strip.all_to_base(skip_active=False, show=True)
+    #
+    # for tp in touchSensors:
+    #     tp.led_strip = strip
 
     loop = asyncio.get_event_loop()
 
     try:
         print('task creation started...')
-        loop.create_task(ongoing_update(strip))
+        #loop.create_task(ongoing_update(strip))
         loop.create_task(touch_check(loop, touch_sensor_list=touchSensors))
         loop.run_forever()
     finally:
         loop.close()
-        strip.base_color = Color(0, 0, 22)
-        strip.all_to_base()
+        #strip.base_color = Color(0, 0, 22)
+        #strip.all_to_base()
