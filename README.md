@@ -3,6 +3,8 @@ cd
 
 cd treechipi
 
+export PATH=$PATH:/home/pi/.local/python/bin/
+
 python3 -m pip install -r requirements.txt
 
 
