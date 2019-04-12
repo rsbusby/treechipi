@@ -7,6 +7,7 @@ export PATH=$PATH:/home/pi/.local/python/bin/
 
 /home/pi/.local/bin/python3 -m pip install -r requirements.txt
 
+/home/pi/.local/bin/python3  -m pip install python-box
 
 
 ##### Set Raspberry Pi volume 
