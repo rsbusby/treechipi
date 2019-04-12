@@ -1,0 +1,333 @@
+[
+ {
+  "verbosity": 1,
+  "vol": -2000,
+  "pin": 23,
+  "dir": "t1",
+  "name": "t1",
+  "timeout": 10,
+  "sustain": false,
+  "minimum_interval": 1,
+  "relay_output_pin": null,
+  "relay_output_duration": 3,
+  "led_enabled": true,
+  "base_color_rgb": [
+   25,
+   0,
+   32
+  ],
+  "active_color_rgb": [
+   38,
+   30,
+   0
+  ],
+  "mock": true,
+  "mock_period": 12
+ },
+ {
+  "verbosity": 1,
+  "vol": -2000,
+  "pin": 26,
+  "dir": "t2",
+  "name": "t2",
+  "timeout": 10,
+  "sustain": false,
+  "minimum_interval": 1,
+  "relay_output_pin": null,
+  "relay_output_duration": 3,
+  "led_enabled": true,
+  "base_color_rgb": [
+   25,
+   0,
+   32
+  ],
+  "active_color_rgb": [
+   40,
+   1,
+   40
+  ],
+  "mock": true,
+  "mock_period": 0,
+  "active_color_string": null
+ },
+ {
+  "verbosity": 1,
+  "vol": -2000,
+  "pin": 27,
+  "dir": "t3",
+  "name": "t3",
+  "timeout": 10,
+  "sustain": false,
+  "minimum_interval": 1,
+  "relay_output_pin": 5,
+  "relay_output_duration": 3,
+  "led_enabled": false,
+  "base_color_rgb": [
+   25,
+   0,
+   32
+  ],
+  "active_color_rgb": [
+   68,
+   60,
+   0
+  ],
+  "mock": true,
+  "mock_period": 12
+ },
+ {
+  "verbosity": 1,
+  "vol": -2000,
+  "pin": 20,
+  "dir": "t4",
+  "name": "t4",
+  "timeout": 10,
+  "sustain": false,
+  "minimum_interval": 1,
+  "relay_output_pin": 19,
+  "relay_output_duration": 3,
+  "led_enabled": false,
+  "base_color_rgb": [
+   25,
+   0,
+   32
+  ],
+  "active_color_rgb": [
+   68,
+   60,
+   0
+  ],
+  "mock": true,
+  "mock_period": 12
+ },
+ {
+  "verbosity": 1,
+  "vol": -2000,
+  "pin": 14,
+  "dir": "t5",
+  "name": "t5",
+  "timeout": 10,
+  "sustain": false,
+  "minimum_interval": 1,
+  "relay_output_pin": 6,
+  "relay_output_duration": 3,
+  "led_enabled": false,
+  "base_color_rgb": [
+   25,
+   0,
+   32
+  ],
+  "active_color_rgb": [
+   68,
+   60,
+   0
+  ],
+  "mock": true,
+  "mock_period": 12
+ },
+ {
+  "verbosity": 1,
+  "vol": -2000,
+  "pin": 2,
+  "dir": "t6",
+  "name": "t6",
+  "timeout": 10,
+  "sustain": false,
+  "minimum_interval": 1,
+  "relay_output_pin": null,
+  "relay_output_duration": 3,
+  "led_enabled": false,
+  "base_color_rgb": [
+   25,
+   0,
+   32
+  ],
+  "active_color_rgb": [
+   68,
+   60,
+   0
+  ],
+  "mock": true,
+  "mock_period": 12
+ },
+ {
+  "verbosity": 1,
+  "vol": -2000,
+  "pin": 24,
+  "dir": "p1",
+  "name": "p1",
+  "timeout": 120,
+  "sustain": true,
+  "minimum_interval": 20,
+  "relay_output_pin": null,
+  "relay_output_duration": 4,
+  "led_enabled": false,
+  "base_color_rgb": [
+   25,
+   0,
+   32
+  ],
+  "active_color_rgb": [
+   0,
+   0,
+   77
+  ],
+  "mock": true,
+  "mock_period": 1400,
+  "base_color": [
+   25,
+   0,
+   32
+  ]
+ },
+ {
+  "verbosity": 1,
+  "vol": -2000,
+  "pin": 16,
+  "dir": "p2",
+  "name": "p2",
+  "timeout": 120,
+  "sustain": true,
+  "minimum_interval": 20,
+  "relay_output_pin": null,
+  "relay_output_duration": 4,
+  "led_enabled": false,
+  "base_color_rgb": [
+   25,
+   0,
+   32
+  ],
+  "active_color_rgb": [
+   0,
+   0,
+   77
+  ],
+  "mock": true,
+  "mock_period": 1400,
+  "base_color": [
+   25,
+   0,
+   32
+  ]
+ },
+ {
+  "verbosity": 1,
+  "vol": -2000,
+  "pin": 22,
+  "dir": "p3",
+  "name": "p3",
+  "timeout": 120,
+  "sustain": true,
+  "minimum_interval": 20,
+  "relay_output_pin": null,
+  "relay_output_duration": 4,
+  "led_enabled": false,
+  "base_color_rgb": [
+   25,
+   0,
+   32
+  ],
+  "active_color_rgb": [
+   0,
+   0,
+   77
+  ],
+  "mock": true,
+  "mock_period": 1400,
+  "base_color": [
+   25,
+   0,
+   32
+  ]
+ },
+ {
+  "verbosity": 1,
+  "vol": -2000,
+  "pin": 21,
+  "dir": "p4",
+  "name": "p4",
+  "timeout": 120,
+  "sustain": true,
+  "minimum_interval": 20,
+  "relay_output_pin": null,
+  "relay_output_duration": 4,
+  "led_enabled": false,
+  "base_color_rgb": [
+   25,
+   0,
+   32
+  ],
+  "active_color_rgb": [
+   0,
+   0,
+   77
+  ],
+  "mock": true,
+  "mock_period": 1400,
+  "base_color": [
+   25,
+   0,
+   32
+  ]
+ },
+ {
+  "verbosity": 1,
+  "vol": -2000,
+  "pin": 15,
+  "dir": "p5",
+  "name": "p5",
+  "timeout": 120,
+  "sustain": true,
+  "minimum_interval": 20,
+  "relay_output_pin": null,
+  "relay_output_duration": 4,
+  "led_enabled": false,
+  "base_color_rgb": [
+   25,
+   0,
+   32
+  ],
+  "active_color_rgb": [
+   0,
+   0,
+   77
+  ],
+  "mock": true,
+  "mock_period": 1400,
+  "base_color": [
+   25,
+   0,
+   32
+  ]
+ },
+ {
+  "verbosity": 1,
+  "vol": -2000,
+  "pin": 3,
+  "dir": "p6",
+  "name": "p6",
+  "timeout": 120,
+  "sustain": true,
+  "minimum_interval": 20,
+  "relay_output_pin": null,
+  "relay_output_duration": 4,
+  "led_enabled": false,
+  "base_color_rgb": [
+   25,
+   0,
+   32
+  ],
+  "active_color_rgb": [
+   0,
+   0,
+   77
+  ],
+  "mock": true,
+  "mock_period": 1400,
+  "base_color": [
+   25,
+   0,
+   32
+  ]
+ }
+]
