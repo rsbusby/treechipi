@@ -5,7 +5,7 @@ cd treechipi
 
 export PATH=$PATH:/home/pi/.local/python/bin/
 
-python3 -m pip install -r requirements.txt
+/home/pi/.local/bin/python3 -m pip install -r requirements.txt
 
 
 
@@ -114,12 +114,18 @@ Get code from github, on Pi
 Open terminal on Pi
 git clone https://github.com/rsbusby/treechipi.git 
 Configure:
+
 cd treechipi
+
 sudo sh config
+
 Run
+
 sudo sh run
 
 Set up auto-start
+
 (from treechipi directory)
+
 sudo cp -f scripts/rc.local /etc/
 
