@@ -7,7 +7,7 @@ from neopixel import *
 import numpy as np
 from copy import deepcopy
 
-update_period = 0.0004
+update_period = 0.8
 
 from collections import deque
 import webcolors
@@ -15,18 +15,19 @@ import sys
 import random
 
 from .tree_colors import *
+from colorsys import hsv_to_rgb
 
 
-def get_default_tree_strip(data_pin, num_pixels):
+def get_default_tree_strip(data_pin, num_pixels, channel=0):
     # LED strip configuration:
     LED_COUNT = num_pixels  # Number of LED pixels.
     LED_PIN = data_pin  # GPIO pin connected to the pixels (18 uses PWM!).
     # LED_PIN        = 10      # GPIO pin connected to the pixels (10 uses SPI /dev/spidev0.0).
     LED_FREQ_HZ = 800000  # LED signal frequency in hertz (usually 800khz)
     LED_DMA = 10  # DMA channel to use for generating signal (try 10)
-    LED_BRIGHTNESS = 100  # Set to 0 for darkest and 255 for brightest
+    LED_BRIGHTNESS = 250  # Set to 0 for darkest and 255 for brightest
     LED_INVERT = False  # True to invert the signal (when using NPN transistor level shift)
-    LED_CHANNEL = 0  # set to '1' for GPIOs 13, 19, 41, 45 or 53
+    LED_CHANNEL = channel  # set to '1' for GPIOs 13, 19, 41, 45 or 53
 
     strip = TreeStrip(LED_COUNT, LED_PIN, LED_FREQ_HZ, LED_DMA,
                       LED_INVERT, LED_BRIGHTNESS, LED_CHANNEL,
@@ -40,8 +41,8 @@ class TreeStrip(Adafruit_NeoPixel):
         super(TreeStrip, self).__init__(*args, **kwargs)
 
         self.verbosity = 0
-
-        self.base_color = Color(4, 0, 32) #dark_orange  # Color(22, 0, 3)
+        self.index = kwargs.get('index', 0)
+        self.base_color = TreeStrip.rgb_to_color(hsv_to_rgb(0.001, 1, 44))  #Color(4, 0, 32) #dark_orange  # Color(22, 0, 3)
         self.active_color = orange
         self.num_pix = self.numPixels()
 
@@ -66,9 +67,11 @@ class TreeStrip(Adafruit_NeoPixel):
 
         self.is_active = False
         self.updating = False
-        self.update_interval = 0.01
+        self.update_interval = 0.8
 
         self.pixel_change = 1
+
+        self.substrips = []
 
     @staticmethod
     def rgb_components(color):
@@ -152,15 +155,15 @@ class TreeStrip(Adafruit_NeoPixel):
     #         new_base_RGB
     #         self.base_color =
 
-    def all_to_base(self, skip_active=False, show=True):
+    def all_to_color(self, color, skip_active=False, show=True):
 
         for i in range(self.num_pix):
-            if skip_active and i == self.active_pixel:
-                pass
-            else:
-                self.set_pixel_color(i, self.base_color)
+            self.setPixelColor(i, color)
         if show:
             self.show()
+
+    def all_to_base(self, skip_active=False, show=True):
+        return self.all_to_color(color=self.base_color, skip_active=skip_active, show=show)
 
     def maybe_change_base_color(self, color, chance=0.001):
         if random.random() < chance:
@@ -206,7 +209,7 @@ class TreeStrip(Adafruit_NeoPixel):
         else:
             return False
 
-    def update(self):
+    def update_old(self):
 
         """
         mimic Arduino code from TreeChi.
@@ -215,50 +218,68 @@ class TreeStrip(Adafruit_NeoPixel):
 
 
         """
+
+        # FDTD pulse
+
+
         needs_update = self.update_base_color()
-
-
-        pdiff = self.target_pixel - self.active_pixel
-        abs_pdiff = abs(pdiff)
-        if abs_pdiff > 1:
-            # move pixel
-            # if abs_pdiff < 10:
-            #     self.pixel_change = max(0.5, abs_pdiff * abs_pdiff / 100.0)
-            # else:
-            #     self.pixel_change = min(1.0, self.pixel_change + 0.1)
-            #
-
-            if pdiff > 0:
-                self.active_pixel = self.active_pixel + self.pixel_change
-            else:
-                self.active_pixel = self.active_pixel - self.pixel_change
-            needs_update = True
-
-        else:
-            if not self.is_active and self.random_signal_when_inactive:
-                self.target_pixel = random.randint(0, 30)
-            elif self.is_active and self.random_signal_when_active:
-                self.target_pixel = random.randint(int(self.num_pix / 5 * 3), int(self.num_pix))
-
-
+        #
+        #
+        # pdiff = self.target_pixel - self.active_pixel
+        # abs_pdiff = abs(pdiff)
+        # if abs_pdiff > 1:
+        #     # move pixel
+        #     # if abs_pdiff < 10:
+        #     #     self.pixel_change = max(0.5, abs_pdiff * abs_pdiff / 100.0)
+        #     # else:
+        #     #     self.pixel_change = min(1.0, self.pixel_change + 0.1)
+        #     #
+        #
+        #     if pdiff > 0:
+        #         self.active_pixel = self.active_pixel + self.pixel_change
+        #     else:
+        #         self.active_pixel = self.active_pixel - self.pixel_change
+        #     needs_update = True
+        #
+        # else:
+        #     if not self.is_active and self.random_signal_when_inactive:
+        #         self.target_pixel = random.randint(0, 30)
+        #     elif self.is_active and self.random_signal_when_active:
+        #         self.target_pixel = random.randint(int(self.num_pix / 5 * 3), int(self.num_pix))
+        print("update")
         if needs_update:
             # set this to avoid it changing in the loop!
-            active_temp = deepcopy(self.active_pixel)
-            base_temp = deepcopy(self.base_color)
-            base_rgb = TreeStrip.rgb_components(self.base_color)
-            pulse_width = self.pulse_width
-            for i in range(self.num_pix):
-                active_diff = np.abs(i - active_temp)
-                if active_diff < pulse_width:
-                    boost = pulse_width - active_diff
-                    rgb_color = TreeStrip.boost_brightness(base_rgb, boost, self.boost_factor)
-                    color = TreeStrip.rgb_to_color(rgb_color)
-                else:
-                    color = base_temp
 
-                self.set_pixel_color(pixel=i, color=color)
+            hue = random.random()
+            rgb = hsv_to_rgb(hue, 1.0, 233)
+            print("HUE {}, RGB: {}".format(hue, rgb))
+
+            color2 = TreeStrip.rgb_to_color(hsv_to_rgb(hue, 1, 33))
+            self.all_to_color(color2, show=True)
+
+            # active_temp = deepcopy(self.active_pixel)
+            # base_temp = deepcopy(self.base_color)
+            # base_rgb = TreeStrip.rgb_components(self.base_color)
+            # pulse_width = self.pulse_width
+            # for i in range(self.num_pix):
+            #     active_diff = np.abs(i - active_temp)
+            #     if active_diff < pulse_width:
+            #         boost = pulse_width - active_diff
+            #         rgb_color = TreeStrip.boost_brightness(base_rgb, boost, self.boost_factor)
+            #         color = TreeStrip.rgb_to_color(rgb_color)
+            #     else:
+            #         color = base_temp
+            #
+            #     self.set_pixel_color(pixel=i, color=color)
 
             if self.verbosity:
                 print(f"done update, {self.target_pixel}  {self.active_pixel:0.1f} {self.pixel_change:0.1f}")
 
-            self.show()
+            #self.show()
+
+
+
+    def update(self):
+
+        #print(f'update strip {self.index}')
+        self.show()

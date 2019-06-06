@@ -16,7 +16,7 @@ from box import Box
 
 
 from neopixel import *
-from treechipi.touch_play import TouchPlay, create_from_box
+from treechipi.touch_play import TouchPlay, create_from_box, assign_led_strips, configure_sensor_objects
 from treechipi.tree_strip import get_default_tree_strip, TreeStrip
 
 debug = True
@@ -45,8 +45,11 @@ for pin in touch_input_pins:
 for pin in prox_input_pins:
     GPIO.setup(pin, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 
-sdir = '/home/pi/media'
-
+home_dir = '/home/pi/'
+#home_dir = './'
+sdir = '{}media'.format(home_dir)
+config_stub = 'config_hue_01'
+config_file = '{}treechipi/treechipi/{}.json'.format(home_dir, config_stub)
 
 def files_from_dir(d, wd=None):
     if not wd:
@@ -69,43 +72,52 @@ async def touch_check(event_loop, touch_sensor_list):
             s.check_new(event_loop)
 
 
-async def ongoing_update(strip):
+async def ongoing_update(strips):
     while True:
-        await asyncio.sleep(strip.update_interval)
-        strip.update()
+        await asyncio.sleep(strips[0].update_interval)
+        for current_strip in strips:
+            for substrip in getattr(current_strip, 'substrips'):
+                substrip.update()
+            current_strip.update()
 
 
 # Main program logic follows:
 if __name__ == '__main__':
 
-    # get configuration, read file
-    with open('/home/pi/treechipi/treechipi/config_07.json', 'r') as myfile:
-        data = myfile.read()
+    # # get configuration, read file
+    # with open('/home/pi/treechipi/treechipi/config_07.json', 'r') as myfile:
+    #     data = myfile.read()
 
-    # parse file
-    config_dict_list = json.loads(data)
-    config_box_list = [Box(d) for d in config_dict_list]
-    touchSensors = [create_from_box(b) for b in config_box_list]
-    print(len(touchSensors))
-
-    strip = get_default_tree_strip(data_pin=18, num_pixels=300)
+    # strip 1 on PWM0
+    strip = get_default_tree_strip(data_pin=18, num_pixels=150)
+    strip.index = 0
     strip.begin()
-    strip.update_interval = 0.04
+    strip.update_interval = 0.05
     print("LED strip initialized...\n")
-    strip.base_color = touchSensors[0].base_color
-    strip.all_to_base(skip_active=False, show=True)
 
-    for tp in touchSensors:
-        tp.led_strip = strip
+    # strip 2 on PWM1
+    strip2 = get_default_tree_strip(data_pin=19, num_pixels=150, channel=1)
+    strip2.index = 1
+    strip2.begin()
+    strip2.update_interval = 0.05
+    print("LED strip 2 initialized...\n")
+
+    strips = [strip, strip2]
+
+    # # configure sensor objects
+    # config_dict_list = json.loads(data)
+    # config_box_list = [Box(d) for d in config_dict_list]
+    # touchSensors = [create_from_box(b) for b in config_box_list]
+    #
+    # assign_led_strips(touch_sensor_list=touchSensors, strip_list=strips)
+
+    touch_sensors = configure_sensor_objects(config_file_path=config_file, strip_list=strips)
 
     loop = asyncio.get_event_loop()
-
     try:
         print('task creation started...')
-        loop.create_task(ongoing_update(strip))
-        loop.create_task(touch_check(loop, touch_sensor_list=touchSensors))
+        loop.create_task(ongoing_update(strips))
+        loop.create_task(touch_check(loop, touch_sensor_list=touch_sensors))
         loop.run_forever()
     finally:
         loop.close()
-        strip.base_color = Color(0, 0, 22)
-        strip.all_to_base()

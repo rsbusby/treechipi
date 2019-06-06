@@ -6,10 +6,17 @@ from copy import deepcopy
 # # Set up input GPIO pins
 from treechipi.constants import touch_input_pins, prox_input_pins, relay_output_pins
 
+#touch_input_pins = [23, 26, 27, 20, 14, 2]
+
+
 shared_base_color_rgb = (25, 0, 32)
 shared_base_color_string = None
 
-proximity_enabled = True
+proximity_enabled = False
+
+config_dir = '/home/pi/treechipi/treechipi'
+#config_dir = '.'
+config_stub = 'config_hue_01'
 
 # Main program logic follows:
 if __name__ == '__main__':
@@ -17,20 +24,19 @@ if __name__ == '__main__':
     touch_config_list = []
     prox_config_list = []
 
-    mock_val = False
+    mock_val = True
     verbosity = 1
 
     tc = Box()
 
-    # touch
-
+    # Create basic parameters for each touch sensor
     for pin_index in range(0, 6):
         index = pin_index + 1
 
         tc = deepcopy(tc)
         tc.verbosity = verbosity
         tc.vol = -2000
-        tc.pin = touch_input_pins[pin_index]
+        #tc.pin = touch_input_pins[pin_index]
         tc.dir = f't{index}'
         tc.name = tc.dir
         tc.timeout = 16
@@ -39,49 +45,109 @@ if __name__ == '__main__':
         tc.relay_output_pin = None
         tc.relay_output_duration = 3
         tc.led_enabled = False
-        tc.base_color_rgb = shared_base_color_rgb
-        tc.active_color_rgb = (38, 30, 0)
+        #tc.base_color_rgb = shared_base_color_rgb
+        #tc.active_color_rgb = (38, 30, 0)
         tc.mock = mock_val
         tc.mock_period = 12
         touch_config_list.append(tc)
 
-    t1 = touch_config_list[0]
-    t1.led_enabled = True
-    t1.active_color_rgb =  (38, 30, 0)
-
     try:
-        t6 = touch_config_list[5]
-        t6.led_enabled = True
+        t1 = touch_config_list[0]
+        t1.pin = 23
+        t1.relay_output_pin = None
+        t1.led_enabled = True
+        t1.active_color_hue = 0.3
 
-        t6.minimum_interval = 0
-        t6.mock_period = 0
-
-        t6.active_color_string = None
-        t6.active_color_rgb = (0, 30, 40)
-        t6.relay_output_pin = None
-    except:
-        pass
-
-    try:
-        t3 = touch_config_list[2]
-        t3.led_enabled = False
-        t3.relay_output_pin = 5
+        # Configure LED strip(s)
+        strip_config = Box()
+        strip_config.strip_index = 0
+        strip_config.start_pixel = 0
+        strip_config.end_pixel = 50
+        t1.strip_config = [strip_config]
     except:
         pass
 
     try:
         t2 = touch_config_list[1]
-        t2.led_enabled = False
-        t2.relay_output_pin = 19
+        t2.pin = 26
+        t2.led_enabled = True
+        t2.relay_output_pin = None
+
+        # Configure LED strip(s)
+        strip_config = Box()
+        strip_config.strip_index = 0
+        strip_config.start_pixel = 51
+        strip_config.end_pixel = 100
+        t2.strip_config = [strip_config]
+    except:
+        pass
+
+    try:
+        t3 = touch_config_list[2]
+        t3.pin = 27
+        t3.led_enabled = True
+        t3.relay_output_pin = 5
+
+        # Configure LED strip(s)
+        strip_config = Box()
+        strip_config.strip_index = 0
+        strip_config.start_pixel = 101
+        strip_config.end_pixel = 150
+        t3.strip_config = [strip_config]
+
+    except:
+        pass
+
+    try:
+        t4 = touch_config_list[3]
+        t4.pin = 20
+        t4.led_enabled = True
+        t4.relay_output_pin = 6
+
+        # Configure LED strip(s)
+        strip_config = Box()
+        strip_config.strip_index = 1
+        strip_config.start_pixel = 0
+        strip_config.end_pixel = 50
+        t4.strip_config = [strip_config]
     except:
         pass
 
     try:
         t5 = touch_config_list[4]
-        t5.led_enabled = False
-        t5.relay_output_pin = 6
+        t5.pin = 14
+        t5.led_enabled = True
+        t5.relay_output_pin = 8
+
+        # Configure LED strip(s)
+        strip_config = Box()
+        strip_config.strip_index = 1
+        strip_config.start_pixel = 50
+        strip_config.end_pixel = 100
+        t5.strip_config = [strip_config]
     except:
         pass
+
+    try:
+        t6 = touch_config_list[5]
+        t6.pin = 2
+        t6.led_enabled = True
+
+        t6.minimum_interval = 0
+        t6.mock_period = 14
+
+        t6.active_color_hue = 0.6
+        t6.relay_output_pin = None
+
+        # Configure LED strip(s)
+        strip_config = Box()
+        strip_config.strip_index = 1
+        strip_config.start_pixel = 101
+        strip_config.end_pixel = 150
+        t6.strip_config = [strip_config]
+    except:
+        pass
+
 
     # proximity
     for pin_index in range(0, 6):
@@ -91,7 +157,7 @@ if __name__ == '__main__':
         index = pin_index + 1
 
         tc.vol = -2000
-        tc.pin = prox_input_pins[pin_index]
+        #tc.pin = prox_input_pins[pin_index]
         tc.dir = f'p{index}'
         tc.name = tc.dir
         tc.timeout = 120
@@ -202,7 +268,9 @@ if __name__ == '__main__':
 
     json_string = json.dumps([b.to_dict() for b in touch_config_list], indent=True)
 
-    with open('/home/pi/treechipi/treechipi/config_07.json', 'w') as myfile:
+
+
+    with open('{}/{}.json'.format(config_dir, config_stub), 'w+') as myfile:
         myfile.write(json_string)
 
 

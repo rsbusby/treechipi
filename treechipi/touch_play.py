@@ -5,6 +5,7 @@ import asyncio
 from time import sleep 
 import os
 from random import randint
+import json
 
 import subprocess
 import pydub
@@ -12,6 +13,7 @@ from pydub import AudioSegment
 from pydub.playback import play
 from datetime import datetime
 import random
+from box import Box
 
 import collections
 import itertools
@@ -19,6 +21,7 @@ import itertools
 
 from treechipi.tree_colors import *
 from treechipi.tree_strip import TreeStrip
+from treechipi.led_strip_section import SubStrip
 
 
 sdir = '/home/pi/media'
@@ -48,7 +51,15 @@ def create_from_box(b):
     :return:
     """
 
+    print(f'Setting up input sensor for config')
+    print(b.to_json(indent=True))
     touch_play = TouchPlay(b.pin, files_from_dir_recursive(b.dir), timeout=b.timeout, sustain=b.sustain)
+
+    try:
+        touch_play.strip_config = b.strip_config
+    except:
+        print(f'No LED strip configuration for {b.dir}')
+
     touch_play.minimum_interval = b.minimum_interval
     touch_play.relay_output_pin = b.relay_output_pin
     touch_play.relay_output_duration = b.relay_output_duration
@@ -97,6 +108,45 @@ def create_from_box(b):
     print(f'led: {touch_play.led_enabled}')
     return touch_play
 
+
+def assign_led_strips(touch_sensor_list, strip_list):
+    """ Given JSON configuration, set up one or more sub-strips to be associated with sensor activation"""
+    STRIP_INDEX_KEY = 'strip_index'
+
+    for touch_sensor in touch_sensor_list:
+        try:
+            touch_sensor.substrips = []
+            strip_config_dict_list = touch_sensor.strip_config
+            for substrip_config in strip_config_dict_list:
+                strip_index = substrip_config[STRIP_INDEX_KEY]
+                strip = strip_list[strip_index]
+                start_pixel = substrip_config['start_pixel']
+                end_pixel = substrip_config['end_pixel']
+                substrip = SubStrip(strip=strip, start_pixel=start_pixel, end_pixel=end_pixel)
+                touch_sensor.substrips.append(substrip)
+                strip.substrips.append(substrip)
+                print(f"Added substrip to touch sensor {touch_sensor.name}, "
+                      f"strip {substrip_config[STRIP_INDEX_KEY]}, "
+                      f"start {start_pixel}, end {end_pixel}")
+        except (AttributeError, KeyError) as e:
+            print(e)
+            print("Error configuring LED sub-strip for touch sensor {}".format(touch_sensor.name))
+            continue
+
+
+def configure_sensor_objects(strip_list, config_file_path):
+    # configure sensor objects
+
+    # get configuration, read file
+    with open(config_file_path, 'r') as myfile:
+        data = myfile.read()
+
+    config_dict_list = json.loads(data)
+    config_box_list = [Box(d) for d in config_dict_list]
+    touch_sensors = [create_from_box(b) for b in config_box_list]
+
+    assign_led_strips(touch_sensor_list=touch_sensors, strip_list=strip_list)
+    return touch_sensors
 
 class TouchPlay(object):
 
@@ -242,38 +292,55 @@ class TouchPlay(object):
     #     if stderr:
     #         print(f'[stderr]\n{stderr.decode()}')
 
-    async def trigger_led(self):
-        """
-        Trigger LED strip for a bit
-        """
-        self.led_on()
-        await asyncio.sleep(self.relay_output_duration)
-        self.led_off()
+    # async def trigger_led(self):
+    #     """
+    #     Trigger LED strip for a bit
+    #     """
+    #     self.led_on()
+    #     await asyncio.sleep(self.relay_output_duration)
+    #     self.led_off()
+    #
+    # def led_on(self):
+    #     """
+    #     Trigger LED strip on
+    #     """
+    #     if self.verbosity:
+    #         print(f'{self.pin} LED is active! color to {self.active_color}')
+    #     self.led_strip.target_base_color = self.active_color
+    #     self.led_strip.target_pixel = self.led_strip.num_pix - randint(2, 20)
+    #     self.led_active = True
+    #     self.led_strip.is_active = True
+    #     self.led_strip.update_interval = 0.5
+    #
+    # def led_off(self):
+    #     """
+    #     Trigger LED strip off
+    #     """
+    #     self.led_active = False
+    #     self.led_strip.target_base_color = self.base_color
+    #     self.led_strip.target_pixel = randint(0, 10)
+    #     self.led_strip.is_active = False
+    #     self.led_strip.update_interval = 0.9
+    #
+    #     if self.verbosity:
+    #         print(f'{self.pin} LED is inactive, color to {self.base_color}')
 
-    def led_on(self):
+    async def trigger_led_substrip(self):
         """
-        Trigger LED strip on
+        Trigger LED sub-strips for a bit
         """
-        if self.verbosity:
-            print(f'{self.pin} LED is active! color to {self.active_color}')
-        self.led_strip.target_base_color = self.active_color
-        self.led_strip.target_pixel = self.led_strip.num_pix - randint(2, 20)
+
+        for substrip in self.substrips:
+            print(f'sensor {self.pin} LED activated, strip {substrip.strip.index}, '
+                  f'pixels {substrip.start_pixel} to {substrip.end_pixel}')
+            substrip.activate()
         self.led_active = True
-        self.led_strip.is_active = True
-        self.led_strip.update_interval = 0.01
 
-    def led_off(self):
-        """
-        Trigger LED strip off
-        """
+        await asyncio.sleep(self.relay_output_duration)
+
         self.led_active = False
-        self.led_strip.target_base_color = self.base_color
-        self.led_strip.target_pixel = randint(0, 10)
-        self.led_strip.is_active = False
-        self.led_strip.update_interval = 0.04
-
-        if self.verbosity:
-            print(f'{self.pin} LED is inactive, color to {self.base_color}')
+        for substrip in self.substrips:
+            substrip.deactivate()
 
     async def trigger_relay(self):
         """
@@ -321,15 +388,15 @@ class TouchPlay(object):
 
         if not sense_val and not self.is_active:
             # sensor is active
-            if self.verbosity > 0:
+            if self.verbosity > 1:
                 print(f'{self.pin} is active')
 
             if self.relay_output_pin and not self.relay_active:
                 event_loop.create_task(self.trigger_relay())
-            if self.led_enabled and not self.led_active and not self.led_strip.is_active:
+            if self.led_enabled and not self.led_active:
                 self.led_active = True
-                self.led_strip.is_active = True
-                event_loop.create_task(self.trigger_led())
+                #self.led_strip.is_active = True
+                event_loop.create_task(self.trigger_led_substrip())
 
         self.process_audio_signal(sense_val)
 
@@ -338,7 +405,6 @@ class TouchPlay(object):
             self.is_active = False
         else:
             self.is_active = True
-
 
     def start_sound(self, start_time):
 
