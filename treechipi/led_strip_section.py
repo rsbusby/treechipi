@@ -35,6 +35,10 @@ def create_led_strip(data_pin, num_pixels, channel=0):
 
 class SubStrip(object):
 
+    FADE = 'fade'
+    STATIC = 'static'
+    WAVE = 'wave'
+
     def __init__(self, **kwargs):
         """ strip, start_pixel, end_pixel"""
         self.start_pixel = kwargs.get('start_pixel')
@@ -42,6 +46,8 @@ class SubStrip(object):
         self.strip = kwargs.get('strip')
         self.brightness = 0.0
         self.hue = 0.5
+        self.update_type = kwargs.get('update_type', SubStrip.FADE)
+        self.hue_list = kwargs.get('hue_list', [])
 
     def all_to_hsv(self, hue, sat, val):
         """Set all pixels in substrip to the same color"""
@@ -50,19 +56,27 @@ class SubStrip(object):
         for pix in range(self.start_pixel, self.end_pixel):
             self.strip.setPixelColorRGB(pix, *rgb)
 
+    def pick_hue(self):
+        if self.hue_list:
+            return random.choice(self.hue_list)
+        else:
+            return random.random()
+
     def activate(self):
         # set to random hue at mid-brightness
-        random_hue = random.random()
+        random_hue = self.pick_hue()
         self.hue = random_hue
         self.brightness = 0.5
         self.all_to_hsv(random_hue, 1.0, self.brightness)
 
     def deactivate(self):
         # set to dark
-        self.all_to_hsv(0.5, 1.0, 0.0)
+        self.brightness = 0.0
+        self.all_to_hsv(self.hue, 1.0, self.brightness)
 
     def update(self):
-        if self.brightness:
+
+        if self.update_type == SubStrip.FADE and self.brightness:
             self.brightness *= 0.92
             self.all_to_hsv(self.hue, 1.0, self.brightness)
             #print(self.brightness)

@@ -27,23 +27,23 @@ GPIO.setmode(GPIO.BCM)
 GPIO.setwarnings(False)  # Disable Warnings
 
 # Set up input GPIO pins
-from treechipi.constants import touch_input_pins, prox_input_pins, relay_output_pins
+#from treechipi.constants import touch_input_pins, prox_input_pins, relay_output_pins
 
 # Set up relay output GPIO pins and set them to off
 #relay_output_pins = [22, 23, 24]
-for i in relay_output_pins:
-    GPIO.setup(i, GPIO.OUT)
-    GPIO.output(i, False)
+# for i in relay_output_pins:
+#     GPIO.setup(i, GPIO.OUT)
+#     GPIO.output(i, False)
 
 
 # Set up input GPIO pins
 #touch_input_pins = [5, 7, 9, 11]
-for pin in touch_input_pins:
-    GPIO.setup(pin, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+# for pin in touch_input_pins:
+#     GPIO.setup(pin, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 
 #prox_input_pins = [6, 8, 10, 12]
-for pin in prox_input_pins:
-    GPIO.setup(pin, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+# for pin in prox_input_pins:
+#     GPIO.setup(pin, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 
 home_dir = '/home/pi/'
 #home_dir = './'
@@ -92,14 +92,14 @@ if __name__ == '__main__':
     strip = get_default_tree_strip(data_pin=18, num_pixels=150)
     strip.index = 0
     strip.begin()
-    strip.update_interval = 0.05
+    strip.update_interval = 0.02
     print("LED strip initialized...\n")
 
     # strip 2 on PWM1
     strip2 = get_default_tree_strip(data_pin=19, num_pixels=150, channel=1)
     strip2.index = 1
     strip2.begin()
-    strip2.update_interval = 0.05
+    strip2.update_interval = 0.02
     print("LED strip 2 initialized...\n")
 
     strips = [strip, strip2]

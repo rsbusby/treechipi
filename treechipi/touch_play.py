@@ -45,15 +45,18 @@ def files_from_dir_recursive(d, wd=None):
     return listOfFiles
 
 
-def create_from_box(b):
+def create_from_box(b, verbosity=1):
     """ Use python-box dict to set up an object
     :param
     :return:
     """
 
-    print(f'Setting up input sensor for config')
-    print(b.to_json(indent=True))
+    if verbosity > 2:
+        print(b.to_json(indent=True))
+
     touch_play = TouchPlay(b.pin, files_from_dir_recursive(b.dir), timeout=b.timeout, sustain=b.sustain)
+
+    GPIO.setup(touch_play.pin, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 
     try:
         touch_play.strip_config = b.strip_config
@@ -62,6 +65,10 @@ def create_from_box(b):
 
     touch_play.minimum_interval = b.minimum_interval
     touch_play.relay_output_pin = b.relay_output_pin
+    if touch_play.relay_output_pin:
+        GPIO.setup(touch_play.relay_output_pin, GPIO.OUT)
+        GPIO.output(touch_play.relay_output_pin, False)
+
     touch_play.relay_output_duration = b.relay_output_duration
 
     touch_play.name = b.get('name', 'noname')
@@ -122,7 +129,11 @@ def assign_led_strips(touch_sensor_list, strip_list):
                 strip = strip_list[strip_index]
                 start_pixel = substrip_config['start_pixel']
                 end_pixel = substrip_config['end_pixel']
-                substrip = SubStrip(strip=strip, start_pixel=start_pixel, end_pixel=end_pixel)
+                substrip = SubStrip(strip=strip, **substrip_config.to_dict())
+                try:
+                    substrip.update_type = substrip_config['update_type']
+                except:
+                    pass
                 touch_sensor.substrips.append(substrip)
                 strip.substrips.append(substrip)
                 print(f"Added substrip to touch sensor {touch_sensor.name}, "
@@ -155,7 +166,9 @@ class TouchPlay(object):
         self.verbosity = 0
         self.name = name
         self.fileList = fileList
+
         self.pin = pin
+
         self.timeout = timeout
         self.sustain = sustain
         self.minimum_interval = None

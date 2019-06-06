@@ -31,7 +31,7 @@ def get_default_tree_strip(data_pin, num_pixels, channel=0):
 
     strip = TreeStrip(LED_COUNT, LED_PIN, LED_FREQ_HZ, LED_DMA,
                       LED_INVERT, LED_BRIGHTNESS, LED_CHANNEL,
-                      strip_type=ws.WS2811_STRIP_GRB)
+                      strip_type=ws.WS2811_STRIP_RGB)
     return strip
 
 

@@ -57,12 +57,16 @@ if __name__ == '__main__':
         t1.relay_output_pin = None
         t1.led_enabled = True
         t1.active_color_hue = 0.3
+        tc.mock_period = 8
+
 
         # Configure LED strip(s)
         strip_config = Box()
         strip_config.strip_index = 0
         strip_config.start_pixel = 0
         strip_config.end_pixel = 50
+        strip_config.update_type = 'static'
+        strip_config.hue_list = [0.33, 0.92]
         t1.strip_config = [strip_config]
     except:
         pass
@@ -134,7 +138,7 @@ if __name__ == '__main__':
         t6.led_enabled = True
 
         t6.minimum_interval = 0
-        t6.mock_period = 14
+        t6.mock_period = 7
 
         t6.active_color_hue = 0.6
         t6.relay_output_pin = None
