@@ -349,11 +349,11 @@ class TouchPlay(object):
             substrip.activate()
         self.led_active = True
 
-        await asyncio.sleep(self.relay_output_duration)
+        #await asyncio.sleep(self.relay_output_duration)
 
         self.led_active = False
-        for substrip in self.substrips:
-            substrip.deactivate()
+        #for substrip in self.substrips:
+        #    substrip.deactivate()
 
     async def trigger_relay(self):
         """
@@ -397,7 +397,8 @@ class TouchPlay(object):
 
         # optionally turn off LED color when input is not active
         if sense_val and self.led_enabled and self.led_active and self.led_off_when_signal_off:
-            self.led_off()
+            pass
+            #self.led_off()
 
         if not sense_val and not self.is_active:
             # sensor is active

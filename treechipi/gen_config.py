@@ -24,7 +24,7 @@ if __name__ == '__main__':
     touch_config_list = []
     prox_config_list = []
 
-    mock_val = True
+    mock_val = False
     verbosity = 1
 
     tc = Box()
@@ -66,7 +66,7 @@ if __name__ == '__main__':
         strip_config.start_pixel = 0
         strip_config.end_pixel = 50
         strip_config.update_type = 'static'
-        strip_config.hue_list = [0.33, 0.92]
+        strip_config.hue_list = [0.33, 0.39]
         t1.strip_config = [strip_config]
     except:
         pass
