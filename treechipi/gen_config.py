@@ -4,7 +4,7 @@ import json
 from copy import deepcopy
 
 # # Set up input GPIO pins
-from treechipi.constants import touch_input_pins, prox_input_pins, relay_output_pins
+#from treechipi.constants import touch_input_pins, prox_input_pins, relay_output_pins
 
 #touch_input_pins = [23, 26, 27, 20, 14, 2]
 
