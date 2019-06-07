@@ -33,7 +33,7 @@ if __name__ == '__main__':
         tc.pin = touch_input_pins[pin_index]
         tc.dir = f't{index}'
         tc.name = tc.dir
-        tc.timeout = 10
+        tc.timeout = 16
         tc.sustain = False
         tc.minimum_interval = 0
         tc.relay_output_pin = None
@@ -98,7 +98,7 @@ if __name__ == '__main__':
         tc.sustain = True
         tc.minimum_interval = 289
         tc.relay_output_pin = None
-        tc.relay_output_duration = 4
+        tc.relay_output_duration = 14
         tc.led_enabled = False
         tc.base_color = shared_base_color_rgb
         tc.active_color_rgb = (0, 0, 77)
@@ -108,13 +108,13 @@ if __name__ == '__main__':
 
     try:
         p2 = prox_config_list[1]
-        p2.minimum_interval = 117
+        p2.minimum_interval = 47
     except Exception as e:
         pass
 
     try:
         p3 = prox_config_list[2]
-        p3.minimum_interval = 71
+        p3.minimum_interval = 53
     except Exception as e:
         pass
 
@@ -132,7 +132,7 @@ if __name__ == '__main__':
 
     try:
         p6 = prox_config_list[4]
-        p6.minimum_interval = 51
+        p6.minimum_interval = 31
     except Exception as e:
         pass
 
