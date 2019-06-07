@@ -24,13 +24,15 @@ if __name__ == '__main__':
     touch_config_list = []
     prox_config_list = []
 
-    mock_val = False
+    mock_val = True
     verbosity = 1
 
     tc = Box()
 
+    num_touch_sensors = 7
+
     # Create basic parameters for each touch sensor
-    for pin_index in range(0, 6):
+    for pin_index in range(0, num_touch_sensors):
         index = pin_index + 1
 
         tc = deepcopy(tc)
@@ -90,7 +92,7 @@ if __name__ == '__main__':
         t3 = touch_config_list[2]
         t3.pin = 27
         t3.led_enabled = True
-        t3.relay_output_pin = 5
+        t3.relay_output_pin = None
 
         # Configure LED strip(s)
         strip_config = Box()
@@ -106,7 +108,7 @@ if __name__ == '__main__':
         t4 = touch_config_list[3]
         t4.pin = 20
         t4.led_enabled = True
-        t4.relay_output_pin = 6
+        t4.relay_output_pin = None
 
         # Configure LED strip(s)
         strip_config = Box()
@@ -119,9 +121,9 @@ if __name__ == '__main__':
 
     try:
         t5 = touch_config_list[4]
-        t5.pin = 14
+        t5.pin = 22
         t5.led_enabled = True
-        t5.relay_output_pin = 8
+        t5.relay_output_pin = None
 
         # Configure LED strip(s)
         strip_config = Box()
@@ -149,6 +151,19 @@ if __name__ == '__main__':
         strip_config.start_pixel = 101
         strip_config.end_pixel = 150
         t6.strip_config = [strip_config]
+    except:
+        pass
+
+    try:
+        t7 = touch_config_list[6]
+        t7.pin = 24
+        t7.led_enabled = False
+
+        t7.minimum_interval = 3
+        t7.mock_period = 17
+
+        t7.relay_output_pin = 16
+
     except:
         pass
 

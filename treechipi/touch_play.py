@@ -108,6 +108,9 @@ def create_from_box(b, verbosity=1):
     touch_play.mock = b.get('mock', True)
     touch_play.mock_period = b.get('mock_period', 20)
 
+    if touch_play.mock:
+        print(f"*** mocking {touch_play.pin} ***")
+
     touch_play.led_off_when_signal_off = not touch_play.mock
 
     print(f'Setting up input sensor for pin {b.pin}, directory {b.dir}, name {touch_play.name}')
