@@ -60,8 +60,8 @@ def files_from_dir(d, wd=None):
 
 touchSensors = []
 
-touch_check_interval = 0.4
-led_update_interval = 0.04
+touch_check_interval = 0.3
+led_update_interval = 0.02
 
 
 async def touch_check(event_loop, touch_sensor_list):

@@ -66,6 +66,7 @@ if __name__ == '__main__':
         strip_config.strip_index = 0
         strip_config.start_pixel = 0
         strip_config.end_pixel = 49
+        strip_config.fade_factor = 0
         strip_config.update_type = 'fdtd'
         #strip_config.hue_list = [0.33, 0.39]
         t1.strip_config = [strip_config]
@@ -84,6 +85,7 @@ if __name__ == '__main__':
         strip_config.strip_index = 0
         strip_config.start_pixel = 50
         strip_config.end_pixel = 99
+        strip_config.fade_factor = 0.8
         strip_config.update_type = 'fdtd' #'fade'
         t2.strip_config = [strip_config]
     except:

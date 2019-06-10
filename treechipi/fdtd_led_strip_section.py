@@ -40,7 +40,7 @@ class FDTDSubStrip(SubStrip):
         print("FDTD activated")
         random_hue = self.pick_hue()
         self.hue = random_hue
-        self.brightness = 0.5
+        self.brightness = self.activation_brightness
 
     def update_fdtd(self, e0, threshold=0.01):
         self.fdtd.step_slow(e0=e0)
@@ -50,7 +50,7 @@ class FDTDSubStrip(SubStrip):
 
         if self.update_type == FDTDSubStrip.FDTD:
             e0 = self.brightness
-            self.brightness *= 0.9
+            self.brightness *= self.fade_factor
             self.update_fdtd(e0)
 
         else:
