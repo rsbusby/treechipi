@@ -60,8 +60,8 @@ def files_from_dir(d, wd=None):
 
 touchSensors = []
 
-touch_check_interval = 0.3333
-led_update_interval = 0.01
+touch_check_interval = 0.4
+led_update_interval = 0.04
 
 
 async def touch_check(event_loop, touch_sensor_list):
@@ -88,18 +88,19 @@ if __name__ == '__main__':
     # with open('/home/pi/treechipi/treechipi/config_07.json', 'r') as myfile:
     #     data = myfile.read()
 
+
     # strip 1 on PWM0
     strip = get_default_tree_strip(data_pin=18, num_pixels=150)
     strip.index = 0
     strip.begin()
-    strip.update_interval = 0.02
+    strip.update_interval = led_update_interval
     print("LED strip initialized...\n")
 
     # strip 2 on PWM1
     strip2 = get_default_tree_strip(data_pin=19, num_pixels=150, channel=1)
     strip2.index = 1
     strip2.begin()
-    strip2.update_interval = 0.02
+    strip2.update_interval = led_update_interval
     print("LED strip 2 initialized...\n")
 
     strips = [strip, strip2]

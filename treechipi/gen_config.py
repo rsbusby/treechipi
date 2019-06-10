@@ -25,7 +25,7 @@ if __name__ == '__main__':
     prox_config_list = []
 
     mock_val = False
-    verbosity = 1
+    verbosity = 0
 
     tc = Box()
 
@@ -50,7 +50,7 @@ if __name__ == '__main__':
         #tc.base_color_rgb = shared_base_color_rgb
         #tc.active_color_rgb = (38, 30, 0)
         tc.mock = mock_val
-        tc.mock_period = 12
+        tc.mock_period = 8000
         touch_config_list.append(tc)
 
     try:
@@ -59,16 +59,15 @@ if __name__ == '__main__':
         t1.relay_output_pin = None
         t1.led_enabled = True
         t1.active_color_hue = 0.3
-        tc.mock_period = 8
-
+        t1.mock_period = 8
 
         # Configure LED strip(s)
         strip_config = Box()
         strip_config.strip_index = 0
         strip_config.start_pixel = 0
-        strip_config.end_pixel = 50
-        strip_config.update_type = 'fade'
-        strip_config.hue_list = [0.33, 0.39]
+        strip_config.end_pixel = 49
+        strip_config.update_type = 'fdtd'
+        #strip_config.hue_list = [0.33, 0.39]
         t1.strip_config = [strip_config]
     except:
         pass
@@ -78,12 +77,14 @@ if __name__ == '__main__':
         t2.pin = 26
         t2.led_enabled = True
         t2.relay_output_pin = None
+        t2.mock_period = 16
 
         # Configure LED strip(s)
         strip_config = Box()
         strip_config.strip_index = 0
-        strip_config.start_pixel = 51
-        strip_config.end_pixel = 100
+        strip_config.start_pixel = 50
+        strip_config.end_pixel = 99
+        strip_config.update_type = 'fdtd' #'fade'
         t2.strip_config = [strip_config]
     except:
         pass
@@ -94,11 +95,13 @@ if __name__ == '__main__':
         t3.led_enabled = True
         t3.relay_output_pin = None
 
+        t3.mock_period = 800
+
         # Configure LED strip(s)
         strip_config = Box()
         strip_config.strip_index = 0
-        strip_config.start_pixel = 101
-        strip_config.end_pixel = 150
+        strip_config.start_pixel = 100
+        strip_config.end_pixel = 149
         t3.strip_config = [strip_config]
 
     except:
@@ -140,7 +143,7 @@ if __name__ == '__main__':
         t6.led_enabled = True
 
         t6.minimum_interval = 0
-        t6.mock_period = 7
+        #t6.mock_period = 7
 
         t6.active_color_hue = 0.6
         t6.relay_output_pin = None

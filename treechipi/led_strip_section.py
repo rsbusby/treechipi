@@ -43,9 +43,11 @@ class SubStrip(object):
         """ strip, start_pixel, end_pixel"""
         self.start_pixel = kwargs.get('start_pixel')
         self.end_pixel = kwargs.get('end_pixel')
+        self.num_pixels = self.end_pixel - self.start_pixel + 1
         self.strip = kwargs.get('strip')
         self.brightness = 0.0
         self.hue = 0.5
+        self.sat = 1.0
         self.update_type = kwargs.get('update_type', SubStrip.FADE)
         self.hue_list = kwargs.get('hue_list', [])
 
@@ -67,16 +69,16 @@ class SubStrip(object):
         random_hue = self.pick_hue()
         self.hue = random_hue
         self.brightness = 0.5
-        self.all_to_hsv(random_hue, 1.0, self.brightness)
+        self.all_to_hsv(random_hue, self.sat, self.brightness)
 
     def deactivate(self):
         # set to dark
         self.brightness = 0.0
-        self.all_to_hsv(self.hue, 1.0, self.brightness)
+        self.all_to_hsv(self.hue, self.sat, self.brightness)
 
     def update(self):
 
         if self.update_type == SubStrip.FADE and self.brightness:
             self.brightness *= 0.92
-            self.all_to_hsv(self.hue, 1.0, self.brightness)
+            self.all_to_hsv(self.hue, self.sat, self.brightness)
             #print(self.brightness)

@@ -22,6 +22,7 @@ import itertools
 from treechipi.tree_colors import *
 from treechipi.tree_strip import TreeStrip
 from treechipi.led_strip_section import SubStrip
+from treechipi.fdtd_led_strip_section import FDTDSubStrip
 
 
 sdir = '/home/pi/media'
@@ -109,13 +110,14 @@ def create_from_box(b, verbosity=1):
     touch_play.mock_period = b.get('mock_period', 20)
 
     if touch_play.mock:
-        print(f"*** mocking {touch_play.pin} ***")
+        print(f"*** mocking {touch_play.pin}, period {touch_play.mock_period} ***")
 
     touch_play.led_off_when_signal_off = not touch_play.mock
 
     print(f'Setting up input sensor for pin {b.pin}, directory {b.dir}, name {touch_play.name}')
     print(f'relay: {touch_play.relay_output_pin}')
     print(f'led: {touch_play.led_enabled}')
+
     return touch_play
 
 
@@ -132,14 +134,19 @@ def assign_led_strips(touch_sensor_list, strip_list):
                 strip = strip_list[strip_index]
                 start_pixel = substrip_config['start_pixel']
                 end_pixel = substrip_config['end_pixel']
-                substrip = SubStrip(strip=strip, **substrip_config.to_dict())
+                update_type = substrip_config.get('update_type', SubStrip.FADE)
+                if update_type == FDTDSubStrip.FDTD:
+                    substrip = FDTDSubStrip(strip=strip, **substrip_config.to_dict())
+                else:
+                    substrip = SubStrip(strip=strip, **substrip_config.to_dict())
                 try:
-                    substrip.update_type = substrip_config['update_type']
+                    substrip.update_type = update_type
                 except:
                     pass
+
                 touch_sensor.substrips.append(substrip)
                 strip.substrips.append(substrip)
-                print(f"Added substrip to touch sensor {touch_sensor.name}, "
+                print(f"Added substrip of type {update_type} to touch sensor {touch_sensor.name}, "
                       f"strip {substrip_config[STRIP_INDEX_KEY]}, "
                       f"start {start_pixel}, end {end_pixel}")
         except (AttributeError, KeyError) as e:
