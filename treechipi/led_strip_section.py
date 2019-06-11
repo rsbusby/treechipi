@@ -65,7 +65,7 @@ class SubStrip(object):
             return random.choice(self.hue_list)
         else:
             hue = random.random()
-            print(f"{hue:0.3f}     --- start: {self.start_pixel}, end: {self.end_pixel}")
+            print(f"   hue: {hue:0.3f}     --- start: {self.start_pixel}, end: {self.end_pixel}")
             return hue
 
     def activate(self):
