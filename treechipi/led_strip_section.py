@@ -49,7 +49,7 @@ class SubStrip(object):
         self.activation_brightness = 0.9
         self.brightness = 0.0
         self.hue = 0.5
-        self.sat = 1.0
+        self.sat = kwargs.get('sat', 1.0)
         self.update_type = kwargs.get('update_type', SubStrip.FADE)
         self.hue_list = kwargs.get('hue_list', [])
         self.upper_hue = kwargs.get('upper_hue', None)
