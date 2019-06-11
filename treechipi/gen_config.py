@@ -155,7 +155,7 @@ if __name__ == '__main__':
         strip_config.start_pixel = 134
         strip_config.end_pixel = 166
         strip_config.update_type = 'fdtd' #'fade'
-        strip_config.lower_hue = 0.6
+        strip_config.lower_hue = 0.7
         strip_config.upper_hue = 0.77
 
         t5.strip_config = [strip_config]
