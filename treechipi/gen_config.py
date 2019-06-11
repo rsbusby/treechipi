@@ -65,7 +65,7 @@ if __name__ == '__main__':
         strip_config = Box()
         strip_config.strip_index = 0
         strip_config.start_pixel = 0
-        strip_config.end_pixel = 49
+        strip_config.end_pixel = 33
         strip_config.fade_factor = 0
         strip_config.update_type = 'fdtd'
         #strip_config.hue_list = [0.33, 0.39]
@@ -83,8 +83,8 @@ if __name__ == '__main__':
         # Configure LED strip(s)
         strip_config = Box()
         strip_config.strip_index = 0
-        strip_config.start_pixel = 50
-        strip_config.end_pixel = 99
+        strip_config.start_pixel = 34
+        strip_config.end_pixel = 66
         strip_config.fade_factor = 0.8
         strip_config.update_type = 'fdtd' #'fade'
         t2.strip_config = [strip_config]
@@ -102,8 +102,9 @@ if __name__ == '__main__':
         # Configure LED strip(s)
         strip_config = Box()
         strip_config.strip_index = 0
-        strip_config.start_pixel = 100
-        strip_config.end_pixel = 149
+        strip_config.start_pixel = 67
+        strip_config.end_pixel = 99
+        strip_config.update_type = 'fdtd' #'fade'
         t3.strip_config = [strip_config]
 
     except:
@@ -119,7 +120,8 @@ if __name__ == '__main__':
         strip_config = Box()
         strip_config.strip_index = 1
         strip_config.start_pixel = 0
-        strip_config.end_pixel = 50
+        strip_config.end_pixel = 33
+        strip_config.update_type = 'fdtd' #'fade'
         t4.strip_config = [strip_config]
     except:
         pass
@@ -133,8 +135,9 @@ if __name__ == '__main__':
         # Configure LED strip(s)
         strip_config = Box()
         strip_config.strip_index = 1
-        strip_config.start_pixel = 50
-        strip_config.end_pixel = 100
+        strip_config.start_pixel = 34
+        strip_config.end_pixel = 66
+        strip_config.update_type = 'fdtd' #'fade'
         t5.strip_config = [strip_config]
     except:
         pass
@@ -153,8 +156,9 @@ if __name__ == '__main__':
         # Configure LED strip(s)
         strip_config = Box()
         strip_config.strip_index = 1
-        strip_config.start_pixel = 101
-        strip_config.end_pixel = 150
+        strip_config.start_pixel = 67
+        strip_config.end_pixel = 99
+        strip_config.update_type = 'fdtd' #'fade'
         t6.strip_config = [strip_config]
     except:
         pass

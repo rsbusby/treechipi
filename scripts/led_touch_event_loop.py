@@ -90,14 +90,14 @@ if __name__ == '__main__':
 
 
     # strip 1 on PWM0
-    strip = get_default_tree_strip(data_pin=18, num_pixels=150)
+    strip = get_default_tree_strip(data_pin=18, num_pixels=100)
     strip.index = 0
     strip.begin()
     strip.update_interval = led_update_interval
     print("LED strip initialized...\n")
 
     # strip 2 on PWM1
-    strip2 = get_default_tree_strip(data_pin=19, num_pixels=150, channel=1)
+    strip2 = get_default_tree_strip(data_pin=19, num_pixels=100, channel=1)
     strip2.index = 1
     strip2.begin()
     strip2.update_interval = led_update_interval
