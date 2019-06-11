@@ -144,7 +144,7 @@ if __name__ == '__main__':
 
     try:
         t6 = touch_config_list[5]
-        t6.pin = 2
+        t6.pin = 17
         t6.led_enabled = True
 
         t6.minimum_interval = 0
