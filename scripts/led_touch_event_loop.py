@@ -90,7 +90,7 @@ if __name__ == '__main__':
 
 
     # strip 1 on PWM0
-    strip = get_default_tree_strip(data_pin=18, num_pixels=100)
+    strip = get_default_tree_strip(data_pin=18, num_pixels=200)
     strip.index = 0
     strip.begin()
     strip.update_interval = led_update_interval
@@ -103,7 +103,8 @@ if __name__ == '__main__':
     strip2.update_interval = led_update_interval
     print("LED strip 2 initialized...\n")
 
-    strips = [strip, strip2]
+    #strips = [strip, strip2]
+    strips = [strip]
 
     # # configure sensor objects
     # config_dict_list = json.loads(data)
