@@ -68,6 +68,9 @@ if __name__ == '__main__':
         strip_config.end_pixel = 33
         strip_config.fade_factor = 0
         strip_config.update_type = 'fdtd'
+        strip_config.lower_hue = 0.00
+        strip_config.upper_hue = 0.08
+
         #strip_config.hue_list = [0.33, 0.39]
         t1.strip_config = [strip_config]
     except:
@@ -87,6 +90,10 @@ if __name__ == '__main__':
         strip_config.end_pixel = 66
         strip_config.fade_factor = 0.8
         strip_config.update_type = 'fdtd' #'fade'
+
+        strip_config.lower_hue = 0.10
+        strip_config.upper_hue = 0.18
+
         t2.strip_config = [strip_config]
     except:
         pass
@@ -105,6 +112,9 @@ if __name__ == '__main__':
         strip_config.start_pixel = 67
         strip_config.end_pixel = 99
         strip_config.update_type = 'fdtd' #'fade'
+        strip_config.lower_hue = 0.18
+        strip_config.upper_hue = 0.27
+
         t3.strip_config = [strip_config]
 
     except:
@@ -122,6 +132,9 @@ if __name__ == '__main__':
         strip_config.start_pixel = 100
         strip_config.end_pixel = 133
         strip_config.update_type = 'fdtd' #'fade'
+        strip_config.lower_hue = 0.380
+        strip_config.upper_hue = 0.410
+
         t4.strip_config = [strip_config]
     except:
         pass
@@ -138,6 +151,9 @@ if __name__ == '__main__':
         strip_config.start_pixel = 134
         strip_config.end_pixel = 166
         strip_config.update_type = 'fdtd' #'fade'
+        strip_config.lower_hue = 0.45
+        strip_config.upper_hue = 0.58
+
         t5.strip_config = [strip_config]
     except:
         pass
@@ -159,6 +175,8 @@ if __name__ == '__main__':
         strip_config.start_pixel = 167
         strip_config.end_pixel = 199
         strip_config.update_type = 'fdtd' #'fade'
+        strip_config.lower_hue = 0.6
+        strip_config.upper_hue = 0.77
         t6.strip_config = [strip_config]
     except:
         pass

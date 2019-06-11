@@ -52,6 +52,8 @@ class SubStrip(object):
         self.sat = 1.0
         self.update_type = kwargs.get('update_type', SubStrip.FADE)
         self.hue_list = kwargs.get('hue_list', [])
+        self.upper_hue = kwargs.get('upper_hue', None)
+        self.lower_hue = kwargs.get('lower_hue', None)
 
     def all_to_hsv(self, hue, sat, val):
         """Set all pixels in substrip to the same color"""
@@ -62,11 +64,14 @@ class SubStrip(object):
 
     def pick_hue(self):
         if self.hue_list:
-            return random.choice(self.hue_list)
+            hue = random.choice(self.hue_list)
+        elif self.upper_hue and self.lower_hue:
+            hue = random.uniform(self.lower_hue, self.upper_hue)
         else:
             hue = random.random()
-            print(f"   hue: {hue:0.3f}     --- start: {self.start_pixel}, end: {self.end_pixel}")
-            return hue
+
+        print(f"   hue: {hue:0.3f}     --- start: {self.start_pixel}, end: {self.end_pixel}")
+        return hue
 
     def activate(self):
         # set to random hue at mid-brightness
