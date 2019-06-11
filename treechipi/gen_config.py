@@ -25,7 +25,7 @@ if __name__ == '__main__':
     prox_config_list = []
 
     mock_val = False
-    verbosity = 0
+    verbosity = 1
 
     tc = Box()
 
