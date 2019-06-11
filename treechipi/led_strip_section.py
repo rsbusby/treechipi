@@ -45,7 +45,7 @@ class SubStrip(object):
         self.end_pixel = kwargs.get('end_pixel')
         self.num_pixels = self.end_pixel - self.start_pixel + 1
         self.strip = kwargs.get('strip')
-        self.fade_factor = 0.92
+        self.fade_factor = 0.8
         self.activation_brightness = 0.9
         self.brightness = 0.0
         self.hue = 0.5
