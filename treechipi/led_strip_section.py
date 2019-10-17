@@ -57,7 +57,7 @@ class SubStrip(object):
         self.hue_list = kwargs.get('hue_list', [])
         self.upper_hue = kwargs.get('upper_hue', None)
         self.lower_hue = kwargs.get('lower_hue', None)
-        self.direction = SubStrip.FORWARD
+        self.direction = kwargs.get('direction', SubStrip.FORWARD)
 
     @staticmethod
     def get_directed_range(start, end, direction):

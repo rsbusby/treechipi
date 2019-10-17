@@ -23,11 +23,15 @@ maxPixel = 0;
 # Number of time steps
 nsteps=100;
 # Cell size and time stepping
-c0=3.e8;
-dx=0.01;
-dt=dx/(2.*c0);
+#c0 = 3.e8
+#dx = 0.01
+#dt = dx / (2. * c0)
+
 # Constants
-cc=c0*dt/dx;
+#cc = c0 * dt / dx
+
+#cc = 0.25
+
 
 # Initialize vectors
 #ex1[ke];
@@ -47,13 +51,16 @@ cc=c0*dt/dx;
 
 class FDTD1D(object):
 
-    def __init__(self, ke):
+    def __init__(self, ke, **kwargs):
 
         self.ke = ke
         self.ex = np.zeros(self.ke)
         self.hy = np.zeros(self.ke)
         self.ex = np.zeros(self.ke)
         self.hy = np.zeros(self.ke)
+
+        self.cc = kwargs.get('cc', 0.5)
+        print(f'\n\n\nFDTD cc is {self.cc}\n\n\n')
 
         self.threshold = 0.001
 
@@ -63,7 +70,7 @@ class FDTD1D(object):
 
         # E field loop
         for k in range(1, self.ke, 1):
-            self.ex[k] = damp * self.ex[k] + cc * (self.hy[k - 1] - self.hy[k])
+            self.ex[k] = damp * self.ex[k] + self.cc * (self.hy[k - 1] - self.hy[k])
 
         # Source
         if e0 > self.threshold:
@@ -77,7 +84,7 @@ class FDTD1D(object):
         # H field loop
         for k in range(0, self.ke - 1, 1):
             # hy[k]=damp*(hy[k]+cc*(ex[k]-ex[k+1]));
-            self.hy[k] = (self.hy[k] + cc * (self.ex[k] - self.ex[k + 1]))
+            self.hy[k] = (self.hy[k] + self.cc * (self.ex[k] - self.ex[k + 1]))
 
     # @staticmethod
     # def utah_fdtd_step(ex, hy, e0, threshold, verbosity=1):

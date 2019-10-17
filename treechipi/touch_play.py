@@ -134,7 +134,7 @@ def assign_led_strips(touch_sensor_list, strip_list):
                 strip = strip_list[strip_index]
                 start_pixel = substrip_config['start_pixel']
                 end_pixel = substrip_config['end_pixel']
-                direction = substrip_config['direction']
+                direction = substrip_config.get('direction', SubStrip.FORWARD)
                 update_type = substrip_config.get('update_type', SubStrip.FADE)
                 if update_type == FDTDSubStrip.FDTD:
                     substrip = FDTDSubStrip(strip=strip, **substrip_config.to_dict())
@@ -159,6 +159,7 @@ def assign_led_strips(touch_sensor_list, strip_list):
 def configure_sensor_objects(strip_list, config_file_path):
     # configure sensor objects
 
+    print(f"Getting configureation from {config_file_path}")
     # get configuration, read file
     with open(config_file_path, 'r') as myfile:
         data = myfile.read()

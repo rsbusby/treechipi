@@ -49,7 +49,7 @@ home_dir = '/home/pi/'
 #home_dir = './'
 sdir = '{}media'.format(home_dir)
 config_stub = 'config_hue_01'
-config_file = '{}treechipi/treechipi/{}.json'.format(home_dir, config_stub)
+config_file = f'./{config_stub}.json'.format(config_stub)
 
 def files_from_dir(d, wd=None):
     if not wd:

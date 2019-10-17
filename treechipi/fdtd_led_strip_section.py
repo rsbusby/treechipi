@@ -19,7 +19,8 @@ class FDTDSubStrip(SubStrip):
     def __init__(self, **kwargs):
         """ strip, start_pixel, end_pixel"""
         super(FDTDSubStrip, self).__init__(**kwargs)
-        self.fdtd = FDTD1D(ke=self.num_pixels)
+        self.fdtd_speed = kwargs.get('fdtd_speed', 0.25)
+        self.fdtd = FDTD1D(ke=self.num_pixels, cc=self.fdtd_speed)
         self.fdtd.threshold = 0.2
         self.e0 = 0.0
 
