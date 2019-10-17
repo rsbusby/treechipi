@@ -25,8 +25,13 @@ class FDTDSubStrip(SubStrip):
 
     def set_pixels_from_ex_slow(self):
 
-        for pix in range(self.start_pixel, self.end_pixel):
-            ind = pix - self.start_pixel
+        for pix in self.get_pixel_range():
+
+            if self.direction == SubStrip.FORWARD:
+                ind = pix - self.start_pixel
+            else:
+                ind = self.end_pixel - pix
+
             ex_val = self.fdtd.ex[ind]
             if ex_val > 0:
                 pix_val = ex_val

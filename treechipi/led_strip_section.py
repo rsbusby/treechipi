@@ -39,10 +39,13 @@ class SubStrip(object):
     STATIC = 'static'
     WAVE = 'wave'
 
+    FORWARD = 1
+    BACKWARD = 0
+
     def __init__(self, **kwargs):
         """ strip, start_pixel, end_pixel"""
         self.start_pixel = kwargs.get('start_pixel')
-        self.end_pixel = kwargs.get('end_pixel')
+        self.end_pixel = kwargs.get('end_pixel')  # inclusive
         self.num_pixels = self.end_pixel - self.start_pixel + 1
         self.strip = kwargs.get('strip')
         self.fade_factor = 0.8
@@ -54,12 +57,24 @@ class SubStrip(object):
         self.hue_list = kwargs.get('hue_list', [])
         self.upper_hue = kwargs.get('upper_hue', None)
         self.lower_hue = kwargs.get('lower_hue', None)
+        self.direction = SubStrip.FORWARD
+
+    @staticmethod
+    def get_directed_range(start, end, direction):
+        """Inclusive range, with a direction"""
+        if direction == SubStrip.BACKWARD:
+            return range(end, start - 1, -1)
+        else:
+            return range(start, end + 1, 1)
+
+    def get_pixel_range(self):
+        return SubStrip.get_directed_range(start=self.start_pixel, end=self.end_pixel, direction=self.direction)
 
     def all_to_hsv(self, hue, sat, val):
         """Set all pixels in substrip to the same color"""
         rgb_norm = hsv_to_rgb(hue, sat, val)
         rgb = [int(el*255) for el in rgb_norm]
-        for pix in range(self.start_pixel, self.end_pixel):
+        for pix in self.get_pixel_range():
             self.strip.setPixelColorRGB(pix, *rgb)
 
     def pick_hue(self):

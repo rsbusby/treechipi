@@ -134,6 +134,7 @@ def assign_led_strips(touch_sensor_list, strip_list):
                 strip = strip_list[strip_index]
                 start_pixel = substrip_config['start_pixel']
                 end_pixel = substrip_config['end_pixel']
+                direction = substrip_config['direction']
                 update_type = substrip_config.get('update_type', SubStrip.FADE)
                 if update_type == FDTDSubStrip.FDTD:
                     substrip = FDTDSubStrip(strip=strip, **substrip_config.to_dict())
@@ -148,7 +149,7 @@ def assign_led_strips(touch_sensor_list, strip_list):
                 strip.substrips.append(substrip)
                 print(f"Added substrip of type {update_type} to touch sensor {touch_sensor.name}, "
                       f"strip {substrip_config[STRIP_INDEX_KEY]}, "
-                      f"start {start_pixel}, end {end_pixel}")
+                      f"start {start_pixel}, end {end_pixel}, direction {direction}")
         except (AttributeError, KeyError) as e:
             print(e)
             print("Error configuring LED sub-strip for touch sensor {}".format(touch_sensor.name))
