@@ -66,7 +66,7 @@ if __name__ == '__main__':
         strip_config.strip_index = 0
         strip_config.start_pixel = 0
         strip_config.end_pixel = 33
-        strip_config.direction = 0
+        strip_config.direction = 1
         strip_config.fdtd_speed = 0.2
         strip_config.fade_factor = 0.8
         strip_config.update_type = 'fdtd'
