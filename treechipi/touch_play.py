@@ -22,7 +22,7 @@ import itertools
 from treechipi.tree_colors import *
 from treechipi.tree_strip import TreeStrip
 from treechipi.led_strip_section import SubStrip
-from treechipi.fdtd_led_strip_section import FDTDSubStrip
+from treechipi.fdtd_led_strip_section import FDTDSubStrip, FDTDSubStripMirrored
 
 
 sdir = '/home/pi/media'
@@ -137,7 +137,9 @@ def assign_led_strips(touch_sensor_list, strip_list):
                 direction = substrip_config.get('direction', SubStrip.FORWARD)
                 update_type = substrip_config.get('update_type', SubStrip.FADE)
                 if update_type == FDTDSubStrip.FDTD:
-                    substrip = FDTDSubStrip(strip=strip, **substrip_config.to_dict())
+                    substrip = FDTDSubStripMirrored(strip=strip, **substrip_config.to_dict())
+                elif update_type == FDTDSubStripMirrored.FDTD_MIRRORED:
+                    substrip = FDTDSubStripMirrored(strip=strip, **substrip_config.to_dict())
                 else:
                     substrip = SubStrip(strip=strip, **substrip_config.to_dict())
                 try:
